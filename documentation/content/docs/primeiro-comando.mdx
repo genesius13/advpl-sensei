@@ -1,0 +1,103 @@
+---
+title: Primeiro comando
+description: Tutorial rapido para comecar a usar o advpl-specialist no Claude Code
+---
+
+## Antes de comecar
+
+Certifique-se de que:
+
+1. O plugin esta [instalado](/docs/instalacao)
+2. Voce esta com o Claude Code aberto em um diretorio de projeto Protheus (com arquivos `.prw`, `.tlpp` ou `.ch`)
+
+## Gerando sua primeira funcao
+
+Vamos gerar uma User Function para o modulo de faturamento. No Claude Code, digite:
+
+```bash
+/advpl-specialist:generate function FATA050 --module FAT
+```
+
+### O que acontece?
+
+1. O plugin identifica que voce quer gerar uma **funcao** para o modulo **FAT** (Faturamento)
+2. O agent `code-generator` e acionado com a skill `advpl-code-generation`
+3. O codigo e gerado seguindo as convencoes TOTVS, incluindo:
+   - Cabecalho Protheus.doc com descricao, autor, data e parametros
+   - `#Include "TOTVS.CH"` (e nao o obsoleto `Protheus.ch`)
+   - Estrutura de funcao com tratamento de erros
+   - Comentarios explicativos
+
+O resultado e um arquivo `.prw` pronto para ser compilado no ambiente Protheus.
+
+## Outros exemplos rapidos
+
+### Revisar codigo existente
+
+Analise um arquivo com foco em boas praticas, performance e seguranca:
+
+```bash
+/advpl-specialist:review src/FATA001.prw
+```
+
+O plugin retorna uma analise detalhada com 21 regras de revisao, apontando problemas e sugerindo melhorias.
+
+### Consultar documentacao
+
+Consulte a documentacao de qualquer funcao nativa do Protheus:
+
+```bash
+/advpl-specialist:docs FWExecView
+```
+
+O plugin busca primeiro na referencia local (180+ funcoes documentadas). Se nao encontrar, consulta automaticamente o TDN (TOTVS Developer Network).
+
+### Consultar processos de negocio
+
+Entenda como funciona uma rotina ou integracao entre modulos:
+
+```bash
+/advpl-specialist:process --module FAT --routine MATA461
+```
+
+O plugin retorna informacoes sobre tabelas envolvidas, parametros MV_*, pontos de entrada disponiveis e integracoes com outros modulos.
+
+### Diagnosticar erros
+
+Quando encontrar um erro, passe a mensagem diretamente:
+
+```bash
+/advpl-specialist:diagnose "Variable does not exist: cCodCli"
+```
+
+O plugin analisa a mensagem de erro, identifica a causa provavel e sugere a correcao.
+
+### Explicar codigo para leigos
+
+Precisa explicar uma customizacao para um consultor funcional?
+
+```bash
+/advpl-specialist:explain src/MATA461.prw --level funcional
+```
+
+O plugin gera uma explicacao em linguagem simples, sem termos tecnicos, focada no que o codigo faz do ponto de vista do negocio.
+
+### Gerar dicionario SX
+
+Descreva os campos que precisa em linguagem natural e gere o script:
+
+```bash
+/advpl-specialist:sxgen --type sx3
+```
+
+O plugin pergunta quais campos voce precisa e gera o script completo de dicionario SX3 com validacoes, pictures, triggers e gatilhos.
+
+## Dica: todos os comandos
+
+Para ver a lista completa de comandos disponiveis, consulte a pagina de [Comandos](/docs/comandos).
+
+## Proximos passos
+
+- [Comandos](/docs/comandos) — Referencia completa de todos os 12 comandos
+- [Agentes](/docs/agentes) — Como funcionam os 10 agentes especializados
+- [Skills](/docs/skills) — As 14 bases de conhecimento do plugin

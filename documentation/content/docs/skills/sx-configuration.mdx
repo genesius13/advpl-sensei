@@ -1,0 +1,186 @@
+---
+title: SX Configuration
+description: Templates e regras de validacao para gerar scripts de configuracao do dicionario SX do TOTVS Protheus
+---
+
+# SX Configuration
+
+Templates e regras de validacao para gerar scripts de configuracao do dicionario de dados Protheus. Cobre SX3 (campos), SIX (indices), SX1 (perguntas de relatorio), SX5 (tabelas genericas) e SX7 (gatilhos).
+
+## Quando Usar
+
+- Criar novos campos customizados para uma tabela
+- Definir indices para tabelas customizadas
+- Configurar perguntas de parametros de relatorio
+- Criar tabelas genericas de lookup
+- Configurar gatilhos de campo
+
+## SX3 -- Definicao de Campo
+
+### Campos Obrigatorios
+
+| Campo | Descricao | Exemplo |
+|-------|-----------|---------|
+| X3_ARQUIVO | Alias da tabela | ZA1 |
+| X3_ORDEM | Ordem do campo (2 digitos) | 01 |
+| X3_CAMPO | Nome do campo (ALIAS_FIELD) | ZA1_CODIGO |
+| X3_TIPO | Tipo: C, N, D, L, M | C |
+| X3_TAMANHO | Tamanho | 6 |
+| X3_DECIMAL | Casas decimais (para N) | 0 |
+| X3_TITULO | Titulo pt-BR (max 15 chars) | Codigo |
+| X3_TITSPA | Titulo es (max 15 chars) | Codigo |
+| X3_TITENG | Titulo en (max 15 chars) | Code |
+| X3_DESCRIC | Descricao pt-BR | Codigo da OS |
+| X3_DESCSPA | Descricao es | Codigo de la OS |
+| X3_DESCENG | Descricao en | OS Code |
+| X3_PICTURE | Formato de exibicao | @! |
+| X3_VALID | Expressao de validacao | NaoVazio() |
+| X3_USADO | Em uso (Sim/Nao) | Sim |
+| X3_OBRIGAT | Obrigatorio (Sim/Nao) | Sim |
+| X3_BROWSE | Exibir no browse (Sim/Nao) | Sim |
+| X3_VISUAL | Modo de edicao: Alterar/Visualizar | Alterar |
+| X3_CONTEXT | Contexto: Real/Virtual | Real |
+| X3_CBOX | Opcoes de combo (val1=desc1;val2=desc2) | |
+| X3_RELACAO | Expressao de valor inicial | |
+| X3_F3 | Alias de lookup F3 | SA1 |
+| X3_VLDUSER | Expressao de validacao do usuario | |
+| X3_TRIGGER | Tem gatilho (Sim/Nao) | Nao |
+
+### Regras de Validacao
+
+| Regra | Condicao | Acao |
+|-------|----------|------|
+| Formato do nome do campo | Deve ser ALIAS_XXXXXX (6 chars apos underscore) | Erro se invalido |
+| Tamanho tipo C | 1-254 caracteres | Aviso se > 100 |
+| Tamanho tipo N | Max 18 digitos incluindo decimal | Erro se > 18 |
+| Tamanho tipo D | Sempre 8 | Auto-definir para 8 |
+| Tamanho tipo L | Sempre 1 | Auto-definir para 1 |
+| Tamanho tipo M | Sempre 10 | Auto-definir para 10 |
+| Picture para C | @! (maiuscula), @R (mascara), ou customizado | Sugerir @! para codigos |
+| Picture para N | @E 999,999,999.99 (ajustar ao tamanho) | Auto-gerar a partir de tamanho/decimal |
+| Picture para D | (nao necessario) | Deixar vazio |
+| Obrigatorio + Validacao | Se X3_OBRIGAT = Sim, adicionar NaoVazio() a X3_VALID | Auto-adicionar |
+| Lookup F3 | Se X3_F3 definido, validacao deve incluir ExistCpo | Sugerir adicionar |
+| CBOX + Validacao | Se X3_CBOX definido, adicionar Pertence() a X3_VALID | Auto-adicionar |
+| Auto-incremento | Se chave primaria, definir X3_RELACAO = GetSXENum() | Sugerir para primeiro campo |
+| Gatilho | Se F3 definido e campo de exibicao relacionado necessario, gerar SX7 | Auto-gerar |
+
+### Validacoes Comuns
+
+| Validacao | Quando usar | Sintaxe |
+|-----------|------------|---------|
+| NaoVazio() | Campo obrigatorio | NaoVazio() |
+| ExistCpo(alias, M->field) | Lookup de chave estrangeira | ExistCpo("SA1", M->ZA1_CLIENT) |
+| ExistChav(alias, M->field, order) | Verificacao de chave unica | ExistChav("ZA1", M->ZA1_CODIGO, 1) |
+| Pertence(values) | Validacao de combo | Pertence("1234") |
+| Positivo() | Deve ser > 0 | Positivo() |
+| Vazio() .Or. ExistCpo() | Chave estrangeira opcional | Vazio() .Or. ExistCpo("SA1", M->ZA1_CLIENT) |
+
+### Pictures Comuns
+
+| Tipo | Picture | Exemplo de exibicao |
+|------|---------|---------------------|
+| Codigo (maiuscula) | @! | ABC123 |
+| CNPJ | @R 99.999.999/9999-99 | 12.345.678/0001-90 |
+| CPF | @R 999.999.999-99 | 123.456.789-00 |
+| Telefone | @R (99) 99999-9999 | (11) 98765-4321 |
+| Moeda | @E 999,999,999.99 | 1,234.56 |
+| Percentual | @E 999.99 | 15.50 |
+
+## SIX -- Definicao de Indice
+
+### Campos Obrigatorios
+
+| Campo | Descricao | Exemplo |
+|-------|-----------|---------|
+| INDICE | Alias da tabela | ZA1 |
+| ORDEM | Numero de ordem do indice | 1 |
+| CHAVE | Expressao de chave (campos concatenados) | ZA1_FILIAL + ZA1_CODIGO |
+| DESCRICAO | Descricao pt-BR | Codigo |
+| DESCSPA | Descricao es | Codigo |
+| DESCENG | Descricao en | Code |
+| NICKNAME | Apelido do indice | ZA1_CODIGO |
+| SHOWPESQ | Exibir na pesquisa (Sim/Nao) | Sim |
+
+### Regras
+
+- Indice 1 e SEMPRE a chave primaria (FILIAL + campo unico)
+- FILIAL deve ser o primeiro componente de todo indice
+- Nickname deve ser unico dentro da tabela
+- Ordem deve ser sequencial comecando de 1
+
+## SX1 -- Perguntas de Relatorio
+
+### Campos Obrigatorios
+
+| Campo | Descricao | Exemplo |
+|-------|-----------|---------|
+| X1_GRUPO | Nome do grupo (corresponde ao alias do relatorio) | ZA1 |
+| X1_ORDEM | Ordem da pergunta (2 digitos) | 01 |
+| X1_PERGUNT | Texto da pergunta pt-BR | Data Abertura De |
+| X1_PERGSPA | Texto da pergunta es | Fecha Apertura De |
+| X1_PERGENG | Texto da pergunta en | Open Date From |
+| X1_TIPO | Tipo: C, N, D | D |
+| X1_TAMANHO | Tamanho do campo | 8 |
+| X1_GSC | Get/Select/Combo: G, S, C | G |
+| X1_VALID | Expressao de validacao | |
+| X1_DEF01 | Valor padrao | Space(8) |
+| X1_F3 | Lookup F3 (para tipo C) | SA1 |
+| X1_HELP | Texto de ajuda | Data inicial |
+
+### Regras
+
+- Perguntas vem em pares para filtros de faixa (De/Ate)
+- Tipo D sempre tem tamanho 8
+- Padrao para data "De": Space(8) ou primeiro dia do mes
+- Padrao para data "Ate": dDataBase ou ultimo dia do mes
+- Padrao para char "De": Space(tamanho)
+- Padrao para char "Ate": Replicate("Z", tamanho)
+- Se combo (C), X1_DEF01 contem o valor da opcao padrao
+- X1_GSC: G=Get (input de texto), S=Select (incomum), C=Combo
+
+## SX5 -- Tabelas Genericas
+
+### Campos Obrigatorios
+
+| Campo | Descricao | Exemplo |
+|-------|-----------|---------|
+| X5_FILIAL | Filial (geralmente vazio para global) | |
+| X5_TABELA | Codigo da tabela (2 chars) | ZZ |
+| X5_CHAVE | Valor da chave (2 chars) | 01 |
+| X5_DESCRI | Descricao pt-BR | Preventiva |
+| X5_DESCSPA | Descricao es | Preventiva |
+| X5_DESCENG | Descricao en | Preventive |
+
+### Regras
+
+- Codigo da tabela: 2 caracteres maiusculos (usar prefixo Z para custom: ZA, ZB, ZZ, etc.)
+- Chave: 2 caracteres, sequencial (01, 02, 03...)
+- Para usar no codigo: GetSX5("ZZ", "01") ou X5DESCRI("ZZ", "01")
+
+## SX7 -- Gatilhos
+
+### Campos Obrigatorios
+
+| Campo | Descricao | Exemplo |
+|-------|-----------|---------|
+| X7_CAMPO | Campo de origem | ZA1_CLIENT |
+| X7_SEQUENC | Sequencia (3 digitos) | 001 |
+| X7_REGRA | Expressao a avaliar | Posicione("SA1", 1, xFilial("SA1") + M->ZA1_CLIENT, "A1_NOME") |
+| X7_CDOMIN | Campo de dominio (destino a preencher) | ZA1_NMCLI |
+| X7_TIPO | Tipo: P=Primario | P |
+| X7_SEEK | Expressao de seek | xFilial("SA1") + M->ZA1_CLIENT |
+| X7_ALIAS | Alias de lookup | SA1 |
+| X7_ORDEM | Ordem do indice para seek | 1 |
+| X7_CHTEFIL | Verificar filial (Sim/Nao) | Sim |
+
+### Regras
+
+- Gatilhos disparam quando o campo de origem muda
+- Posicione() e a funcao padrao para lookups
+- Sempre incluir xFilial() na expressao de seek
+- Sequencia permite multiplos gatilhos no mesmo campo
+
+## Formato de Saida
+
+Scripts sao formatados como blocos chave-valor, uma definicao de campo por bloco, separados por tracos. Este formato e legivel e pode ser usado como referencia para configuracao manual no Configurador ou para scripts de importacao.

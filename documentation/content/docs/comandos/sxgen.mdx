@@ -1,0 +1,95 @@
+---
+title: /sxgen
+description: Gera scripts de configuracao do dicionario de dados SX do Protheus - campos SX3, indices SIX, perguntas SX1, tabelas genericas SX5
+---
+
+# /advpl-specialist:sxgen
+
+Gera scripts de configuracao do dicionario de dados do Protheus para tabelas SX.
+
+## Uso
+
+```bash
+/advpl-specialist:sxgen [options]
+```
+
+Descreva o que voce precisa em linguagem natural apos o comando. O agente ira analisar sua descricao e gerar a configuracao.
+
+## Opcoes
+
+| Flag | Descricao | Padrao |
+|------|-----------|--------|
+| `--type` | Tipo SX: `sx3`, `six`, `sx1`, `sx5` | Auto-detectar a partir da descricao |
+| `--output` | Salvar script em arquivo | Exibir no chat |
+
+## Tipos de Configuracao
+
+| Tipo | O que gera |
+|------|------------|
+| `sx3` | Definicoes de campos (X3_ARQUIVO, X3_CAMPO, X3_TIPO, etc.) + gatilhos SX7 |
+| `six` | Definicoes de indices (INDICE, ORDEM, CHAVE, NICKNAME) |
+| `sx1` | Definicoes de perguntas de relatorio (X1_GRUPO, X1_PERGUNT, X1_TIPO) |
+| `sx5` | Entradas de tabela generica (X5_TABELA, X5_CHAVE, X5_DESCRI) |
+
+## Validacoes Automaticas
+
+O comando automaticamente:
+- Valida tipos e tamanhos de campos
+- Gera pictures baseadas no tipo (moeda, data, codigo)
+- Adiciona NaoVazio() para campos obrigatorios
+- Adiciona ExistCpo() para campos com consulta F3
+- Adiciona Pertence() para campos com opcoes combo
+- Gera gatilhos SX7 para campos com consulta F3
+- Inclui suporte a 3 idiomas (pt-BR, es, en)
+- Garante que FILIAL e o primeiro campo nos indices
+
+## Processo
+
+1. **Analisar entrada** - Identificar tipo e especificacoes de campos a partir de linguagem natural
+2. **Carregar skill de configuracao SX** - Invocar skill `sx-configuration`
+3. **Delegar ao agente sx-configurator** - Passar requisitos analisados
+4. **Validar** - Verificar tipos, tamanhos, pictures, validacoes
+5. **Gerar script** - Blocos de chave-valor formatados com todos os campos
+6. **Entregar** - Exibir ou salvar no arquivo de saida
+
+## Exemplos
+
+```bash
+# Gerar definicoes de campos SX3 a partir de descricao
+/advpl-specialist:sxgen --type sx3
+Criar campos para tabela ZA1 - Ordens de Servico:
+- ZA1_CODIGO: codigo da OS, char 6, obrigatorio
+- ZA1_DESCRI: descricao do servico, char 40, obrigatorio
+- ZA1_CLIENT: codigo do cliente, char 6, valida na SA1
+- ZA1_STATUS: status, char 1, combo 1=Aberta;2=Em Andamento;3=Concluida;4=Cancelada
+
+# Gerar definicoes de indices SIX
+/advpl-specialist:sxgen --type six
+Indices para ZA1:
+- Indice 1: filial + codigo (unico)
+- Indice 2: filial + cliente + data abertura
+
+# Gerar perguntas de relatorio SX1
+/advpl-specialist:sxgen --type sx1
+Perguntas para relatorio de OS (grupo ZA1):
+- Data abertura de/ate
+- Status de/ate
+- Cliente de/ate
+
+# Gerar tabela generica SX5
+/advpl-specialist:sxgen --type sx5
+Tabela generica ZZ para tipos de servico:
+01=Preventiva, 02=Corretiva, 03=Instalacao
+
+# Salvar em arquivo
+/advpl-specialist:sxgen --type sx3 --output config/ZA1-campos.txt
+```
+
+## Saida
+
+Script de configuracao formatado com:
+- Cabecalho com nome da tabela, data e informacao do gerador
+- Definicoes completas de campos com todos os atributos necessarios
+- Validacoes e pictures geradas automaticamente
+- Gatilhos SX7 (para SX3 com consultas F3)
+- Pronto para entrada manual no Configurador ou referencia para importacao APSDU/UPDDISTR

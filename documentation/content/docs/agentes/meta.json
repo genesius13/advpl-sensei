@@ -1,0 +1,15 @@
+{
+  "title": "Agentes",
+  "pages": [
+    "code-generator",
+    "code-reviewer",
+    "migrator",
+    "debugger",
+    "docs-reference",
+    "process-consultant",
+    "refactorer",
+    "doc-generator",
+    "changelog-generator",
+    "sx-configurator"
+  ]
+}

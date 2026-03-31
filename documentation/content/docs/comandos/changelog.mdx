@@ -1,0 +1,63 @@
+---
+title: /changelog
+description: Gera changelog a partir de alteracoes de codigo ADVPL/TLPP - analisa diffs e produz notas de release estruturadas
+---
+
+# /advpl-specialist:changelog
+
+Gera um changelog estruturado a partir de alteracoes de codigo em arquivos ADVPL/TLPP.
+
+## Uso
+
+```bash
+/advpl-specialist:changelog [options]
+```
+
+## Opcoes
+
+| Flag | Descricao | Padrao |
+|------|-----------|--------|
+| `--since` | Ponto de partida: hash de commit, tag ou data (YYYY-MM-DD) | Ultimo commit (HEAD~1) |
+| `--format` | Formato de saida: `markdown`, `txt` | `markdown` |
+| `--output` | Salvar em arquivo | Exibir no chat |
+| `--group-by` | Agrupar entradas por: `file`, `type`, `module` | `type` |
+
+## Processo
+
+1. **Analisar argumentos** - Identificar escopo, formato e opcoes de saida
+2. **Carregar skill de changelog** - Invocar skill `changelog-patterns`
+3. **Delegar ao agente changelog-generator** - Passar escopo e opcoes
+4. **Identificar arquivos alterados** - Usar git diff ou lista de arquivos fornecida
+5. **Analisar cada arquivo** - Classificar tipo de alteracao, detectar tabelas, avaliar impacto
+6. **Gerar changelog** - Aplicar template de formato com entradas agrupadas
+7. **Entregar** - Exibir ou salvar no arquivo de saida
+
+## Exemplos
+
+```bash
+# Changelog do ultimo commit
+/advpl-specialist:changelog
+
+# Changelog desde um commit especifico
+/advpl-specialist:changelog --since abc1234
+
+# Changelog desde uma data
+/advpl-specialist:changelog --since 2026-03-01
+
+# Changelog em formato texto plano
+/advpl-specialist:changelog --since v1.0.0 --format txt
+
+# Salvar changelog em um arquivo
+/advpl-specialist:changelog --since v1.0.0 --output CHANGELOG.md
+
+# Agrupar por modulo ao inves de tipo
+/advpl-specialist:changelog --since v1.0.0 --group-by module
+```
+
+## Saida
+
+Changelog estruturado com:
+- Data e versao (se disponivel)
+- Resumo das alteracoes
+- Entradas agrupadas por tipo (NEW, FIX, CHANGE, REMOVE, REFACTOR)
+- Cada entrada: descricao, arquivo, nivel de impacto, tabelas afetadas

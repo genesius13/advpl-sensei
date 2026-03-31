@@ -1,0 +1,57 @@
+---
+title: /review
+description: Revisa codigo ADVPL/TLPP quanto a boas praticas, performance, seguranca e modernizacao
+---
+
+# /advpl-specialist:review
+
+Revisa codigo ADVPL/TLPP quanto a boas praticas, performance, seguranca e oportunidades de modernizacao.
+
+## Uso
+
+```bash
+/advpl-specialist:review <target> [--focus category]
+```
+
+## Categorias de Foco
+
+| Foco | Descricao |
+|------|-----------|
+| `boas-praticas` | Boas praticas: variaveis, locks, tratamento de erros, nomenclatura |
+| `performance` | Performance: queries, loops, indexacao |
+| `seguranca` | Seguranca: SQL injection, validacao de entrada, credenciais |
+| `modernizacao` | Modernizacao: ADVPL para TLPP, padroes legados |
+| `all` | Todas as categorias (padrao) |
+
+## Processo
+
+1. **Analisar argumentos** - Identificar arquivo(s) alvo e categoria `--focus` opcional
+2. **Carregar skill de review** - Invocar skill `advpl-code-review` e ler arquivos de regras relevantes
+3. **Delegar ao agente code-reviewer** - Passar alvos e foco para o agente code-reviewer para analise sistematica
+4. **Apresentar resultados** - Relatorio estruturado agrupado por severidade com sugestoes de correcao acionaveis
+
+## Exemplos
+
+```bash
+# Revisar um unico arquivo-fonte (todas as categorias)
+/advpl-specialist:review src/FATA001.prw
+
+# Revisar um diretorio inteiro focando em performance
+/advpl-specialist:review src/ --focus performance
+
+# Revisar endpoints REST quanto a problemas de seguranca
+/advpl-specialist:review src/REST/*.tlpp --focus seguranca
+
+# Revisar diretorio atual quanto a oportunidades de modernizacao
+/advpl-specialist:review . --focus modernizacao
+
+# Revisar arquivos especificos quanto a boas praticas
+/advpl-specialist:review src/MATA010.prw --focus boas-praticas
+```
+
+## Saida
+
+- Achados agrupados por arquivo e severidade (CRITICAL, WARNING, INFO)
+- Cada achado inclui: ID da regra, referencia arquivo:linha, codigo atual, correcao sugerida e explicacao
+- Tabela resumo com contagens por categoria e severidade
+- Recomendacoes acionaveis priorizadas por impacto

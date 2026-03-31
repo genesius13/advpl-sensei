@@ -1,0 +1,31 @@
+{
+  "name": "documentation",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@tailwindcss/postcss": "^4.2.1",
+    "@types/mdx": "^2.0.13",
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3",
+    "fumadocs-core": "^16.6.17",
+    "fumadocs-mdx": "^14.2.10",
+    "fumadocs-ui": "^16.6.17",
+    "next": "^16.1.7",
+    "react": "^19.2.4",
+    "react-dom": "^19.2.4",
+    "tailwindcss": "^4.2.1",
+    "typescript": "^5.9.3"
+  },
+  "devDependencies": {
+    "@types/node": "25.5.0"
+  }
+}

@@ -1,0 +1,181 @@
+---
+title: ADVPL/TLPP Code Generation
+description: Padroes e templates para gerar codigo ADVPL e TLPP limpo e padronizado para TOTVS Protheus
+---
+
+# ADVPL/TLPP Code Generation
+
+Padroes e templates para gerar codigo ADVPL e TLPP limpo e padronizado para TOTVS Protheus. Cobre User Functions, classes, MVC, APIs REST, Web Services e pontos de entrada.
+
+## Quando Usar
+
+- Criar novas funcoes (User Function, Static Function)
+- Criar classes TLPP com metodos
+- Construir estruturas MVC (Model/View/Controller)
+- Implementar endpoints de API REST
+- Escrever pontos de entrada
+- Criar Web Services SOAP
+- Qualquer criacao de arquivo .prw ou .tlpp
+
+## Convencoes de Nomenclatura
+
+| Elemento | Convencao | Exemplo |
+|----------|-----------|---------|
+| User Function | Prefixo do modulo + nome descritivo | `FATA001` (Faturamento), `COMA100` (Compras) |
+| Static Function | Descritivo, camelCase ou PascalCase | `ValidaCampo`, `GravaRegistro` |
+| Classe (TLPP) | PascalCase, sufixo com proposito | `PedidoService`, `ClienteController` |
+| Metodo | camelCase | `getTotal`, `validarDados` |
+| Variavel Local | Prefixo c/n/d/l/a/o + PascalCase | `cNome`, `nTotal`, `dData`, `lOk`, `aItens`, `oObj` |
+| Parametro | Mesmo da variavel | `cCodCli`, `nQuantidade` |
+| Constante | UPPER_SNAKE_CASE | `MAX_RETRIES`, `DEFAULT_TIMEOUT` |
+
+### Prefixos de Tipo (Notacao Hungara)
+
+| Prefixo | Tipo | Exemplo |
+|---------|------|---------|
+| c | Character/String | `cNome`, `cEndereco` |
+| n | Numeric | `nValor`, `nQuantidade` |
+| d | Date | `dEmissao`, `dVencimento` |
+| l | Logical/Boolean | `lOk`, `lContinua` |
+| a | Array | `aItens`, `aCampos` |
+| o | Object | `oModel`, `oView` |
+| b | Code Block | `bBloco`, `bCondic` |
+| x | Indefinido (any) | `xRetorno`, `xParam` |
+
+### Prefixos de Modulo
+
+| Prefixo | Modulo |
+|---------|--------|
+| COM | Compras |
+| EST | Estoque |
+| FAT | Faturamento |
+| FIN | Financeiro |
+| CTB | Contabilidade |
+| FIS | Fiscal |
+| GFE | Gestao de Frete |
+| HCM | Capital Humano |
+| MNT | Manutencao de Ativos |
+| PCP | Planejamento e Controle de Producao |
+
+## Estrutura Obrigatoria - User Function
+
+Toda User Function DEVE seguir este padrao:
+
+```c
+#Include "TOTVS.CH"
+#Include "TopConn.ch"
+
+/*/{Protheus.doc} FATA001
+Descricao breve da funcao
+@type User Function
+@author Nome do Autor
+@since DD/MM/YYYY
+@version 1.0
+@param cParam1, Caractere, Descricao do parametro
+@return lRet, Logico, Retorno da funcao
+@example
+    u_FATA001("001")
+/*/
+User Function FATA001(cParam1)
+    Local lRet := .T.
+    Local cAlias := "SA1"
+
+    // Salva area de trabalho
+    Local aArea := GetArea()
+
+    Begin Sequence
+
+        // Logica principal aqui
+        DbSelectArea(cAlias)
+        DbSetOrder(1)
+
+        If DbSeek(xFilial(cAlias) + cParam1)
+            // Processamento
+        Else
+            lRet := .F.
+            MsgAlert("Registro nao encontrado")
+        EndIf
+
+    Recover Using oError
+        lRet := .F.
+        Conout("Erro em FATA001: " + oError:Description)
+    End Sequence
+
+    // Restaura area
+    RestArea(aArea)
+
+Return lRet
+```
+
+## Regras de Escopo de Variaveis
+
+| Escopo | Palavra-chave | Visibilidade | Caso de Uso |
+|--------|---------------|-------------|-------------|
+| Local | `Local` | Somente funcao atual | **Sempre preferir** |
+| Static | `Static` | Arquivo PRW atual | Estado compartilhado no arquivo |
+| Private | `Private` | Funcao atual + funcoes chamadas | **Evitar - usar parametros** |
+| Public | `Public` | Toda aplicacao | **Nunca usar em codigo novo** |
+
+**Boa pratica:** Sempre usar `Local`. Passar dados via parametros, nunca via Private/Public.
+
+## Padrao de Tratamento de Erros
+
+```c
+Local oError
+Local bErrorOld := ErrorBlock({|e| oError := e, Break(e)})
+
+Begin Sequence
+
+    // Codigo que pode falhar
+
+Recover Using oError
+    Conout("Erro: " + oError:Description)
+    Conout("Linha: " + cValToChar(oError:GenCode))
+    // Tratar erro ou re-raise
+
+End Sequence
+
+ErrorBlock(bErrorOld)
+```
+
+## Referencia Rapida - Tipos de Codigo
+
+| Tipo | Extensao do Arquivo | Arquivo de Padrao |
+|------|---------------------|-------------------|
+| User Function | .prw | Inline acima |
+| Static Function | .prw | Inline acima (mesmo arquivo da User Function) |
+| Classe TLPP | .tlpp | templates-classes.md |
+| MVC | .prw | patterns-mvc.md |
+| API REST | .prw ou .tlpp | patterns-rest.md |
+| Ponto de Entrada | .prw | patterns-pontos-entrada.md |
+| Web Service SOAP | .prw | patterns-soap.md |
+
+## Erros Comuns
+
+| Erro | Correcao |
+|------|----------|
+| Usar Private em vez de Local | Sempre declarar como Local, passar via parametros |
+| Declarar Local dentro de If/While/For | TODAS as declaracoes Local devem estar no topo da funcao, antes de qualquer codigo executavel |
+| Nao salvar/restaurar area (GetArea/RestArea) | Sempre envolver operacoes de DB com save/restore de area |
+| Sem tratamento de erros | Sempre usar Begin Sequence / Recover / End Sequence |
+| Nao fechar RecLock | Sempre usar MsUnlock() apos RecLock() |
+| Filial (branch) hardcoded | Usar xFilial(cAlias) para compatibilidade multi-filial |
+| Include TOTVS.CH faltando | Sempre incluir no minimo: #Include "TOTVS.CH" |
+| Nao validar parametros da funcao | Verificar ValType() e valores vazios no inicio da funcao |
+| Usar metodos inexistentes de JsonObject | Somente usar metodos documentados: New, FromJSON, toJSON, GetNames, HasProperty, etc. |
+| Usar GetSoapFault() em TWsdlManager | NAO existe — usar propriedades cFaultCode, cFaultString |
+| Usar EnableTitleGroup em FWFormView | NAO existe — usar EnableTitleView |
+
+## Arquivos de Suporte
+
+Esta skill inclui os seguintes arquivos de suporte com templates e padroes detalhados:
+
+- **patterns-fwformbrowse.md** - Padroes para telas FWFormBrowse/FWExecView
+- **patterns-jobs.md** - Padroes para jobs batch e processos agendados
+- **patterns-mvc.md** - Padroes para estruturas MVC (Model/View/Controller)
+- **patterns-pontos-entrada.md** - Padroes para pontos de entrada do Protheus
+- **patterns-rest.md** - Padroes para endpoints de API REST
+- **patterns-soap.md** - Padroes para Web Services SOAP
+- **patterns-treport.md** - Padroes para relatorios TReport
+- **patterns-workflow.md** - Padroes para processos de workflow
+- **templates-classes.md** - Templates para classes TLPP

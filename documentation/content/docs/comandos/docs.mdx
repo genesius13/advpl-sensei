@@ -1,0 +1,78 @@
+---
+title: /docs
+description: Consulta documentacao do Protheus - funcoes nativas, dicionario de dados SX, APIs REST, parametros MV e referencia do framework
+---
+
+# /advpl-specialist:docs
+
+Consulta documentacao para funcoes, APIs, tabelas e parametros do Protheus.
+
+## Uso
+
+```bash
+/advpl-specialist:docs <term> [options]
+```
+
+## Opcoes
+
+| Flag | Descricao | Padrao |
+|------|-----------|--------|
+| `--source` | Fonte de pesquisa: `local`, `tdn` ou `both` | both (local primeiro) |
+| `--type` | Filtrar por tipo: `function`, `sx`, `api`, `param` | auto-detectar |
+
+## Processo
+
+1. **Analisar consulta** - Extrair termo de busca e opcoes
+2. **Auto-detectar tipo** - Se nao especificado:
+   - Comeca com SX/SI -> sx
+   - Comeca com MV_ -> param
+   - Contem API/REST -> api
+   - Caso contrario -> function
+3. **Pesquisar local** - Verificar arquivos de suporte do skill protheus-reference
+4. **Pesquisar TDN** - Se nao encontrado localmente ou --source tdn, pesquisar online
+5. **Apresentar resultados** - Sintaxe, parametros, tipo de retorno, exemplo
+
+## Exemplos
+
+```bash
+# Consultar uma funcao
+/advpl-specialist:docs FWExecView
+
+# Consultar uma tabela do dicionario de dados
+/advpl-specialist:docs SX2 --type sx
+
+# Consultar um parametro do sistema
+/advpl-specialist:docs MV_ESTADO --type param
+
+# Forcar pesquisa no TDN
+/advpl-specialist:docs MsExecAuto --source tdn
+
+# Consultar padrao de API REST
+/advpl-specialist:docs FWRest --type api
+```
+
+## Saida
+
+Para funcoes:
+- Sintaxe com tipos de parametros
+- Tabela de parametros (nome, tipo, descricao, obrigatorio)
+- Tipo de retorno e descricao
+- Exemplo de codigo
+- Funcoes relacionadas
+
+Para tabelas SX:
+- Proposito da tabela
+- Campos-chave com tipos e descricoes
+- Como acessar programaticamente
+
+Para parametros MV:
+- Proposito do parametro
+- Valor padrao
+- Como ler (GetMV/SuperGetMV)
+- Modulo que o utiliza
+
+Para APIs REST:
+- Padrao do endpoint
+- Metodos HTTP
+- Formato de request/response
+- Requisitos de autenticacao

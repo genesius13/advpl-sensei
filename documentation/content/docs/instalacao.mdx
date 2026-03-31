@@ -1,0 +1,77 @@
+---
+title: Instalacao
+description: Como instalar o plugin advpl-specialist no Claude Code
+---
+
+## Pre-requisitos
+
+Antes de instalar o plugin, certifique-se de que voce tem:
+
+- **Node.js 18+** instalado ([download](https://nodejs.org/))
+- **Claude Code** instalado e configurado ([documentacao oficial](https://docs.anthropic.com/en/docs/claude-code))
+
+## Opcao 1: Via Marketplace (recomendado)
+
+A forma mais simples de instalar e pelo marketplace oficial. Dentro do Claude Code, execute:
+
+```bash
+# 1. Adicione o marketplace do plugin
+/plugin marketplace add thalysjuvenal/advpl-specialist
+
+# 2. Instale o plugin
+/plugin install advpl-specialist@thalysjuvenal-advpl-specialist
+```
+
+Pronto! O plugin ja esta disponivel em todas as sessoes do Claude Code.
+
+## Opcao 2: Instalacao local (para teste/desenvolvimento)
+
+Se voce quer contribuir com o plugin ou testa-lo localmente, clone o repositorio e inicie o Claude Code apontando para o diretorio:
+
+```bash
+# Clone o repositorio
+git clone https://github.com/thalysjuvenal/advpl-specialist.git
+
+# Inicie o Claude Code com o plugin local
+claude --plugin-dir ./advpl-specialist
+```
+
+Nessa opcao, o plugin so estara disponivel enquanto voce usar a flag `--plugin-dir`.
+
+## Verificacao
+
+Apos a instalacao, abra o Claude Code em qualquer diretorio e verifique se o plugin esta ativo:
+
+```bash
+/advpl-specialist:docs FWExecView
+```
+
+Se o plugin responder com a documentacao da funcao `FWExecView`, a instalacao foi bem-sucedida.
+
+## Deteccao automatica de projetos
+
+O plugin detecta automaticamente projetos Protheus ao iniciar uma sessao. Ele procura por arquivos com as extensoes `.prw`, `.tlpp`, `.prx` e `.ch` no diretorio atual. Quando encontra, ativa todo o contexto especializado.
+
+## Recomendado: Playwright MCP
+
+O plugin utiliza o **Playwright MCP** como fallback quando o acesso direto a documentacao do TDN falha (timeout, erro ou conteudo vazio). Com ele, o plugin abre a pagina em um navegador real para extrair o conteudo.
+
+Para instalar:
+
+```bash
+claude mcp add playwright -- npx @anthropic-ai/mcp-playwright@latest
+```
+
+## Recomendado: Plugin superpowers
+
+Para uma experiencia completa, recomendamos instalar tambem o plugin oficial **superpowers**, que adiciona skills de planejamento, brainstorming, debugging sistematico e code review:
+
+```bash
+/plugin marketplace add anthropics/claude-code-plugins
+/plugin install superpowers@anthropics-claude-code-plugins
+```
+
+## Proximos passos
+
+- [Primeiro comando](/docs/primeiro-comando) — Tutorial rapido para comecar a usar
+- [Comandos](/docs/comandos) — Lista completa de comandos disponiveis

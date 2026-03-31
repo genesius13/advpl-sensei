@@ -1,0 +1,78 @@
+---
+title: /migrate
+description: Migra codigo ADVPL procedural para codigo TLPP orientado a objetos com classes, namespaces e padroes modernos
+---
+
+# /advpl-specialist:migrate
+
+Converte codigo ADVPL procedural para TLPP com padroes orientados a objetos.
+
+## Uso
+
+```bash
+/advpl-specialist:migrate <file.prw> [options]
+```
+
+## Opcoes
+
+| Flag | Descricao | Padrao |
+|------|-----------|--------|
+| `--output` | Caminho do arquivo .tlpp de saida | Mesmo nome com extensao .tlpp |
+| `--dry-run` | Mostrar plano de migracao sem gerar arquivos | false |
+| `--keep-original` | Manter o arquivo .prw original | true |
+| `--wrapper` | Gerar wrapper de compatibilidade retroativa | true |
+| `--namespace` | Sobrescrever namespace | Auto-detectado a partir do modulo |
+
+## Processo
+
+**OBRIGATORIO: Sempre entra em modo de planejamento antes de migrar codigo. Nunca pula o planejamento.**
+
+### Fase de Analise
+1. **Ler arquivo-fonte** - Ler o arquivo .prw completamente
+2. **Analisar estrutura** - Identificar funcoes, dependencias, variaveis compartilhadas
+3. **Buscar chamadores** - Pesquisar na base de codigo por referencias `u_NomeFuncao`
+
+### Fase de Planejamento (OBRIGATORIA)
+4. **Carregar skill** - Invocar skill `advpl-to-tlpp-migration` para regras e checklist
+5. **Entrar em modo de planejamento** - Usar `EnterPlanMode` para criar um plano estruturado de migracao
+6. **Projetar estrutura de classes** - Mapear funcoes para classes e metodos
+7. **Apresentar plano** - Mostrar ao usuario um plano detalhado de migracao incluindo:
+   - Analise do arquivo-fonte (funcoes encontradas, dependencias, variaveis compartilhadas)
+   - Chamadores externos que serao impactados
+   - Estrutura da classe alvo (nome da classe, namespace, propriedades, metodos)
+   - Mapeamento: qual funcao se torna qual metodo (publico/privado)
+   - Variaveis Private/Public a converter para propriedades de classe
+   - Includes a atualizar (TOTVS.CH -> tlpp-core.th, etc.)
+   - Se um wrapper de compatibilidade retroativa e necessario
+   - Quaisquer riscos ou breaking changes
+8. **Aguardar aprovacao** - O usuario deve aprovar o plano antes de qualquer codigo ser escrito. Se o usuario solicitar alteracoes, revisar o plano.
+9. **Se --dry-run** - Parar aqui apos mostrar o plano
+10. **Sair do modo de planejamento** - Usar `ExitPlanMode` apos aprovacao
+
+### Fase de Implementacao (somente apos aprovacao)
+11. **Executar migracao** - Gerar arquivo(s) .tlpp seguindo o plano aprovado e skill `advpl-to-tlpp-migration`
+12. **Gerar wrapper** - Criar wrapper .prw de compatibilidade retroativa se --wrapper
+13. **Executar checklist** - Validar contra migration-checklist.md
+14. **Relatar** - Mostrar resumo das alteracoes
+
+## Exemplos
+
+```bash
+# Migrar um arquivo (mostra plano primeiro, depois gera)
+/advpl-specialist:migrate src/FATA001.prw
+
+# Visualizar migracao sem gerar arquivos
+/advpl-specialist:migrate src/FATA001.prw --dry-run
+
+# Especificar caminho de saida e namespace
+/advpl-specialist:migrate src/FATA001.prw --output src/tlpp/PedidoService.tlpp --namespace mycompany.faturamento
+
+# Migrar sem wrapper de compatibilidade retroativa
+/advpl-specialist:migrate src/FATA001.prw --wrapper false
+```
+
+## Saida
+
+- Arquivo `.tlpp` com codigo migrado baseado em classes
+- Wrapper `.prw` opcional para compatibilidade retroativa
+- Resumo da migracao com o que mudou e por que

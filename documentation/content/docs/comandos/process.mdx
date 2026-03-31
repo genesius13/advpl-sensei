@@ -1,0 +1,107 @@
+---
+title: /process
+description: Consulta processos de negocio do Protheus ERP, workflows de modulos, rotinas e integracoes
+---
+
+# /advpl-specialist:process
+
+Consulta processos de negocio do Protheus ERP, workflows de modulos, rotinas e integracoes.
+
+## Uso
+
+```bash
+/advpl-specialist:process <query> [options]
+```
+
+## Opcoes
+
+| Flag | Descricao | Padrao |
+|------|-----------|--------|
+| `--type` | Tipo de consulta: `process`, `routine`, `module`, `integration` | auto-detectar |
+
+## Processo
+
+1. **Carregar skill** - Invocar skill `protheus-business`
+2. **Analisar consulta** - Extrair termo de busca e opcoes
+3. **Classificar tipo de consulta** - Se `--type` nao especificado, auto-detectar:
+   - Contem codigo de rotina (ex.: MATA410, FINA040) -> routine
+   - Contem nome de modulo (Compras, Faturamento, Estoque, etc.) -> module
+   - Contem dois nomes de modulo ou palavras-chave como "integracao" / "integration" -> integration
+   - Caso contrario -> process
+4. **Pesquisar referencia local** - Verificar arquivos de modulos do skill protheus-business (modulo-compras.md, modulo-estoque.md, etc.)
+5. **Pesquisar TDN** - Se nao encontrado localmente, pesquisar TDN online:
+   - Processo: `site:tdn.totvs.com "<processo>" protheus fluxo`
+   - Rotina: `site:tdn.totvs.com "<CODIGO_ROTINA>" rotina`
+   - Modulo: `site:tdn.totvs.com "<modulo>" modulo protheus`
+   - Integracao: `site:tdn.totvs.com "<moduloA>" "<moduloB>" integracao`
+6. **Fallback com Playwright** - Se WebSearch/WebFetch falharem:
+   - Se URL disponivel: `browser_navigate` -> `browser_snapshot` -> `browser_take_screenshot` se necessario
+   - Se sem URL: `browser_navigate` para `https://tdn.totvs.com` -> `browser_fill_form` busca -> `browser_click` submit -> `browser_snapshot` resultados -> navegar para melhor resultado
+   - **Sempre** `browser_close` ao finalizar para liberar recursos
+7. **Entregar resposta** - Formatar resposta baseado no tipo de consulta
+
+## Formato da Resposta
+
+Adaptativo baseado no tipo de consulta:
+
+**Consulta de processo:**
+- Descricao do processo
+- Fluxo passo a passo com rotinas e tabelas em cada etapa
+- Integracoes com outros modulos
+- Pontos de entrada disponiveis
+
+**Consulta de rotina:**
+- O que a rotina faz
+- Tabelas que le/grava
+- Parametros MV que utiliza
+- A qual processo pertence
+- Pontos de entrada disponiveis
+
+**Consulta de modulo:**
+- Visao geral do modulo
+- Tabelas principais
+- Rotinas principais
+- Processos de negocio chave
+- Integracoes com outros modulos
+
+**Consulta de integracao:**
+- Fluxo de dados entre modulos
+- Tabelas de ligacao
+- Rotinas envolvidas em cada lado
+- Direcao do fluxo de dados
+
+## Referencias Cruzadas
+
+Quando o usuario precisa de mais detalhes, carregar skills adicionais:
+- **protheus-reference** - para detalhes de funcoes nativas (sintaxe, parametros, valores de retorno)
+- **advpl-code-generation** - para exemplos de codigo e padroes de implementacao
+- **embedded-sql** - para exemplos de consultas usando Embedded SQL
+
+## Exemplos
+
+```bash
+# Entender um processo de negocio
+/advpl-specialist:process fluxo de compras
+
+# Consultar uma rotina especifica
+/advpl-specialist:process MATA410
+
+# Entender um modulo
+/advpl-specialist:process modulo Faturamento --type module
+
+# Entender integracao entre modulos
+/advpl-specialist:process integracao Compras Estoque --type integration
+
+# Perguntar em linguagem natural
+/advpl-specialist:process como funciona o processo de faturamento no Protheus?
+
+# Consultar processo financeiro
+/advpl-specialist:process contas a pagar
+```
+
+## Saida
+
+- Explicacao clara e estruturada adaptada ao tipo de consulta
+- Referencias a rotinas, tabelas e pontos de entrada
+- Citacao de fonte (referencia local ou TDN)
+- Sugestoes de skills relacionados quando mais detalhes forem necessarios

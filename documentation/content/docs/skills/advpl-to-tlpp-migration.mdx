@@ -1,0 +1,253 @@
+---
+title: ADVPL to TLPP Migration
+description: Abordagem sistematica para converter codigo ADVPL procedural legado para TLPP moderno com programacao orientada a objetos
+---
+
+# ADVPL to TLPP Migration
+
+Abordagem sistematica para converter codigo ADVPL procedural legado para TLPP moderno com padroes de programacao orientada a objetos. Esta skill guia o processo de migracao de arquivos `.prw` com User Functions e Static Functions para arquivos `.tlpp` com namespaces, classes e metodos -- preservando compatibilidade retroativa com chamadores existentes.
+
+## Quando Usar
+
+- Converter funcoes ADVPL procedurais para classes TLPP
+- Refatorar User Functions em classes de servico orientadas a objeto
+- Substituir escopo de variaveis Private/Public por propriedades de classe
+- Modernizar multiplas diretivas `#Include` para includes TLPP `.th` (`tlpp-core.th`, `tlpp-rest.th`, etc.) e adicionar declaracoes de `namespace` apropriadas
+- Migrar Static Functions para metodos privados de classe
+- Encapsular chamadas de funcoes legadas para compatibilidade retroativa durante migracao gradual
+- Qualquer conversao de arquivo `.prw` para `.tlpp`
+
+## Estrategia de Migracao
+
+1. **Analisar** o arquivo `.prw` de origem para entender todas as funcoes, variaveis e dependencias externas
+2. **Identificar** cada User Function e Static Function, seus parametros e estado compartilhado
+3. **Mapear** funcoes para uma estrutura de classe -- metodos, propriedades, parametros do construtor
+4. **Usuario aprova** o design de classe proposto antes da geracao de codigo
+5. **Gerar** o arquivo `.tlpp` com namespace adequado, definicao de classe e implementacoes de metodos
+6. **Executar checklist** do `migration-checklist.md` para verificar completude
+7. **Validar** que o codigo compila e todos os chamadores existentes ainda funcionam
+
+## Regras de Conversao Principais
+
+| Construto ADVPL | Equivalente TLPP | Notas |
+|-----------------|------------------|-------|
+| `#Include "TOTVS.CH"` | `#Include "tlpp-core.th"` | Usar includes especificos TLPP (arquivos `.th`); `Protheus.ch` e obsoleto. NAO adicionar `using namespace tlpp.core`, `tlpp.rest` ou `tlpp.log` -- usar os includes `.th` |
+| `User Function Name()` | `namespace custom.module.service; class NameService; method execute()` | Ponto de entrada principal se torna o metodo publico primario |
+| `Static Function Helper()` | `method helper() as private` | Funcoes internas se tornam metodos privados |
+| `Private cVar := "x"` | `data cVar as character` (propriedade de classe) | Variaveis Private se tornam declaracoes `data` de classe |
+| `Public nGlobal` | Remover -- passar via construtor/parametros | Variaveis Public devem ser eliminadas completamente |
+| `Local aArray := {}` | Inalterado dentro dos metodos | Variaveis locais permanecem como estao no corpo dos metodos |
+
+## Convencoes de Nomenclatura TLPP (Padrao Oficial TOTVS)
+
+### Namespaces
+
+Todos os nomes devem ser em **minusculas**, separados por **pontos**, **sem underscores**.
+
+**Para codigo de produto TOTVS:**
+```
+totvs.protheus.<segmento>.<agrupador/servico>
+```
+
+Segmentos disponiveis: agrobusiness, backoffice, construction, distribution, educational, financial, health, hospitality, legal, manufacturing, retail, services
+
+Exemplos:
+- `totvs.protheus.backoffice.customer`
+- `totvs.protheus.financial.payment.receive`
+- `totvs.protheus.manufacturing.material.balance`
+
+**Para customizacoes de cliente (mais comum em migracoes):**
+```
+custom.<agrupador>.<servico>
+```
+
+Comeca com `custom.`, o restante e livre. Exemplos:
+- `custom.cadastros.cliente`
+- `custom.relatorios.customizados`
+- `custom.faturamento.pedido`
+
+### Nomenclatura de Arquivos
+
+**Para produto TOTVS:** `<segmento>.<agrupador/servico>.<funcionalidade>.tlpp`
+
+**Para customizacoes de cliente:** `custom.<agrupador>.<funcionalidade>.tlpp`
+
+### Classes, Funcoes e Metodos
+
+| Elemento | Convencao | Exemplo |
+|----------|-----------|---------|
+| Classes | **PascalCase** | `ContactsController`, `PedidoService` |
+| Funcoes | **camelCase** | `contactsController()`, `calcTotal()` |
+| Metodos | **camelCase** | `validName()`, `processOrder()` |
+
+**Sem underscores** em nenhum identificador.
+
+## Exemplo Antes/Depois
+
+### Antes (ADVPL Procedural) -- `CalcPed.prw`
+
+```c
+#Include "TOTVS.CH"
+#Include "TopConn.ch"
+
+/*/{Protheus.doc} CalcPed
+Calcula o total de um pedido de venda
+@type User Function
+@author Dev
+@since 01/01/2024
+@param cPedido, Caractere, Numero do pedido
+@return nTotal, Numerico, Valor total do pedido
+/*/
+User Function CalcPed(cPedido)
+    Local nTotal := 0
+    Private cAliasPed := "SC5"
+    Private cAliasItens := "SC6"
+
+    Local aArea := GetArea()
+
+    Begin Sequence
+
+        DbSelectArea(cAliasPed)
+        DbSetOrder(1)
+
+        If !DbSeek(xFilial(cAliasPed) + cPedido)
+            Conout("Pedido nao encontrado: " + cPedido)
+            Break
+        EndIf
+
+        nTotal := fCalcTotal(cPedido)
+
+    Recover Using oError
+        Conout("Erro em CalcPed: " + oError:Description)
+        nTotal := 0
+    End Sequence
+
+    RestArea(aArea)
+Return nTotal
+
+Static Function fCalcTotal(cPedido)
+    Local nSoma := 0
+
+    DbSelectArea(cAliasItens)
+    DbSetOrder(1)
+
+    DbSeek(xFilial(cAliasItens) + cPedido)
+    While !Eof() .And. SC6->C6_NUM == cPedido
+        nSoma += SC6->C6_VALOR * SC6->C6_QTDVEN
+        DbSkip()
+    EndDo
+
+Return nSoma
+```
+
+### Depois (TLPP Orientado a Objetos) -- `custom.faturamento.pedido.tlpp`
+
+```c
+#Include "tlpp-core.th"
+
+namespace custom.faturamento.pedido
+
+class PedidoService
+
+    data cAliasPed   as character
+    data cAliasItens as character
+
+    public method new() as object
+    public method calcTotal(cPedido as character) as numeric
+    private method somaItens(cPedido as character) as numeric
+
+endclass
+
+method new() class PedidoService
+    ::cAliasPed   := "SC5"
+    ::cAliasItens := "SC6"
+return self
+
+method calcTotal(cPedido as character) class PedidoService
+    local nTotal := 0
+    local aArea  := GetArea()
+
+    begin sequence
+
+        DbSelectArea(::cAliasPed)
+        DbSetOrder(1)
+
+        if !DbSeek(xFilial(::cAliasPed) + cPedido)
+            FWLogMsg("WARN", , "PedidoService", "calcTotal", , , ;
+                "Pedido nao encontrado: " + cPedido)
+            break
+        endif
+
+        nTotal := ::somaItens(cPedido)
+
+    recover using oError
+        FWLogMsg("ERROR", , "PedidoService", "calcTotal", , , ;
+            "Erro: " + oError:Description)
+        nTotal := 0
+    end sequence
+
+    RestArea(aArea)
+return nTotal
+
+method somaItens(cPedido as character) class PedidoService
+    local nSoma := 0
+
+    DbSelectArea(::cAliasItens)
+    DbSetOrder(1)
+
+    DbSeek(xFilial(::cAliasItens) + cPedido)
+    while !Eof() .And. (::cAliasItens)->(C6_NUM) == cPedido
+        nSoma += (::cAliasItens)->(C6_VALOR) * (::cAliasItens)->(C6_QTDVEN)
+        DbSkip()
+    enddo
+
+return nSoma
+```
+
+### Wrapper de Compatibilidade Retroativa -- `CalcPed.prw` (preservado)
+
+```c
+#Include "TOTVS.CH"
+
+/*/{Protheus.doc} CalcPed
+Wrapper de compatibilidade - delega para PedidoService (TLPP)
+@type User Function
+@author Dev
+@since 01/01/2024
+@param cPedido, Caractere, Numero do pedido
+@return nTotal, Numerico, Valor total do pedido
+/*/
+User Function CalcPed(cPedido)
+    Local oService := custom.faturamento.pedido.PedidoService():new()
+Return oService:calcTotal(cPedido)
+```
+
+## Decisoes-Chave de Migracao
+
+| Decisao | Diretriz |
+|---------|----------|
+| Uma classe por arquivo | Cada arquivo `.tlpp` deve conter uma unica classe com responsabilidade clara |
+| Namespace = convencao oficial TOTVS | Para customizacoes usar `custom.<agrupador>.<servico>`. Para produto TOTVS usar `totvs.protheus.<segmento>.<agrupador>`. Tudo minusculo, sem underscores, separado por pontos |
+| User Function preservada como wrapper | Manter a User Function original `.prw` como wrapper fino que delega para a nova classe |
+| Migracao gradual | Migrar um grupo de funcoes por vez; wrappers garantem que chamadores existentes nao quebrem |
+| Construtor para estado compartilhado | Valores que eram variaveis `Private`/`Public` compartilhadas entre funcoes devem ser passados pelo construtor ou definidos como propriedades de classe |
+| Logging sobre Conout | Preferir `FWLogMsg()` ou `FWLogError()` sobre `Conout()` raw em classes TLPP |
+
+## Erros Comuns
+
+| Erro | Consequencia | Correcao |
+|------|-------------|----------|
+| Remover User Function sem wrapper | Quebra todos os chamadores externos (`u_FuncName`) | Sempre manter wrapper `.prw` durante migracao |
+| Usar variaveis `Private` dentro de metodos | Variaveis vazam para metodos chamados inesperadamente | Converter para propriedades `data` de classe ou variaveis `Local` |
+| Esquecer prefixo `::` para propriedades de classe | Referencia variavel local indefinida em vez de propriedade | Sempre usar `::propertyName` dentro de metodos |
+| Colocar multiplas classes em um arquivo `.tlpp` | Dificil manter, confusao de namespace | Uma classe por arquivo |
+| Nao preservar `GetArea()`/`RestArea()` | Estado do cursor de banco corrompido para chamadores | Sempre salvar e restaurar area em metodos que acessam DB |
+| Pular `xFilial()` apos migracao | Queries multi-filial retornam dados errados | Sempre usar `xFilial(cAlias)` em operacoes `DbSeek` |
+| Ignorar variaveis Static usadas entre funcoes | Estado compartilhado perdido quando funcoes viram metodos | Converter variaveis `Static` para propriedades `data` de classe |
+
+## Arquivos de Suporte
+
+Esta skill inclui os seguintes arquivos de referencia:
+
+- **migration-rules.md** - Mapeamento completo de todos os construtos ADVPL para equivalentes TLPP
+- **migration-checklist.md** - Checklist passo a passo para executar e validar uma migracao

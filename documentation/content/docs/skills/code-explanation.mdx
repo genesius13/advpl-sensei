@@ -1,0 +1,64 @@
+---
+title: Code Explanation
+description: Metodologia para explicar codigo ADVPL/TLPP em linguagem simples para desenvolvedores e consultores funcionais
+---
+
+# Code Explanation
+
+Metodologia para explicar codigo ADVPL/TLPP em linguagem simples. Adapta a profundidade da explicacao com base no nivel do publico: desenvolvedor junior, desenvolvedor senior ou consultor funcional.
+
+## Quando Usar
+
+- Usuario pede para explicar o que um trecho de codigo faz
+- Usuario quer entender codigo legado
+- Consultor funcional precisa entender uma customizacao
+- Desenvolvedor junior precisa de explicacao linha por linha
+- Documentacao do codigo esta faltando ou nao e clara
+
+## Niveis de Explicacao
+
+| Nivel | Publico | Profundidade | Foco |
+|-------|---------|-------------|------|
+| `junior` | Dev iniciante | Linha por linha | Sintaxe, funcoes, fluxo de execucao |
+| `senior` | Dev experiente | Resumido | Logica de negocio, decisoes de design, riscos |
+| `funcional` | Consultor funcional | Sem termos tecnicos | O que a rotina faz do ponto de vista do negocio |
+
+## Estrutura da Explicacao
+
+### Para --level junior
+
+1. **Objetivo** -- O que essa rotina faz em uma frase
+2. **Includes e dependencias** -- O que cada include traz
+3. **Variaveis** -- Lista de variaveis com tipo e proposito
+4. **Fluxo passo a passo** -- O que cada bloco de codigo faz, na ordem
+5. **Funcoes nativas usadas** -- Breve explicacao de cada funcao do Protheus usada
+6. **Tabelas acessadas** -- Quais tabelas sao lidas/gravadas e por que
+7. **Pontos de atencao** -- Armadilhas, erros comuns, trechos criticos
+
+### Para --level senior
+
+1. **Objetivo** -- O que essa rotina faz em uma frase
+2. **Logica de negocio** -- Regras implementadas e decisoes de design
+3. **Tabelas e campos** -- Resumo das operacoes de banco
+4. **Dependencias externas** -- Funcoes chamadas, includes, pontos de entrada
+5. **Riscos e debitos tecnicos** -- Problemas potenciais, melhorias sugeridas
+
+### Para --level funcional
+
+1. **O que essa rotina faz** -- Em linguagem de negocio, sem codigo
+2. **Quando ela e executada** -- Contexto de uso (menu, schedule, trigger)
+3. **Quais dados ela consulta** -- Tabelas e informacoes lidas (em linguagem de negocio)
+4. **Quais dados ela altera** -- O que muda no sistema quando ela roda
+5. **Regras de negocio** -- Validacoes, calculos, condicoes
+6. **Impacto em outros modulos** -- Se altera dados usados por outros processos
+
+## Processo
+
+1. Ler o arquivo alvo ou trecho de codigo completamente
+2. Determinar o nivel de explicacao (flag --level ou perguntar)
+3. Carregar skill `protheus-reference` se funcoes nativas precisam ser consultadas
+4. Carregar skill `protheus-business` se contexto de negocio e necessario
+5. Carregar skill `embedded-sql` se queries SQL estao presentes
+6. Analisar a estrutura do codigo, identificar funcoes, variaveis, operacoes de DB
+7. Gerar explicacao seguindo a estrutura apropriada para o nivel
+8. Usar o idioma do usuario (Portugues ou Ingles)

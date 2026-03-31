@@ -1,0 +1,100 @@
+---
+title: /test
+description: Gera testes unitarios ProBat para classes e funcoes TLPP
+---
+
+# /advpl-specialist:test
+
+Gera testes unitarios ProBat para classes e funcoes TLPP no TOTVS Protheus.
+
+## Uso
+
+```bash
+/advpl-specialist:test <target> [options]
+```
+
+Onde `<target>` e um caminho de arquivo `.tlpp` ou um nome de funcao/classe.
+
+## Tipos
+
+| Tipo | Descricao | Saida |
+|------|-----------|-------|
+| `unit` | Teste unitario para funcoes ou metodos de classe | arquivo `.tlpp` com `@TestFixture` e assertions |
+| `api` | Teste de endpoint de API REST | arquivo `.tlpp` usando `tlpp.rest.runTestSimple` |
+
+## Opcoes
+
+| Flag | Descricao | Padrao |
+|------|-----------|--------|
+| `--type` | Tipo de teste: `unit` ou `api` | `unit` |
+| `--output` | Caminho do arquivo de saida | `test/unit/test_<name>.tlpp` |
+| `--suite` | Nome da suite para execucao agrupada | Nenhum |
+| `--owner` | Identificador do time/autor para `@TestFixture` | Pergunta ao usuario |
+
+## Importante: ProBat e Somente TLPP
+
+ProBat funciona apenas com TLPP (arquivos `.tlpp`). Se um arquivo `.prw` for passado:
+
+1. Informar ao usuario que ProBat requer TLPP
+2. Sugerir usar `/advpl-specialist:migrate` primeiro para converter o fonte para TLPP
+3. O arquivo de teste em si e sempre `.tlpp`, mesmo ao testar funcoes ADVPL
+
+## Processo
+
+1. **Analisar argumentos** - Extrair arquivo/funcao alvo, tipo e flags
+2. **Ler fonte alvo** - Analisar o arquivo ou funcao para entender o que testar
+3. **Carregar skill** - Invocar skill `probat-testing`
+4. **Carregar padroes** - Ler `patterns-unit-tests.md` para o template apropriado
+5. **Identificar casos de teste** - Determinar:
+   - Funcoes/metodos a testar
+   - Parametros de entrada e saidas esperadas
+   - Casos extremos (valores NIL, strings vazias, tipos invalidos, valores limite)
+   - Cenarios de erro
+6. **Apresentar plano** - Mostrar ao usuario:
+   - Nome e caminho do arquivo de teste
+   - Nome da classe/funcao de teste
+   - Lista de metodos de teste com descricoes
+   - Assertions a serem usadas
+   - Necessidades de Setup/TearDown (se houver)
+7. **Aguardar aprovacao** - O usuario deve aprovar antes de gerar codigo
+8. **Gerar codigo de teste** - Criar o arquivo `.tlpp` de teste seguindo convencoes ProBat:
+   - `#include "tlpp-probat.th"` (e `"tlpp-core.th"` se necessario)
+   - Namespace apropriado (`test.<module>` ou `custom.tests.<module>`)
+   - `@TestFixture` com propriedades `owner` e `target`
+   - `@Test` com descricoes obrigatorias descritivas
+   - Declaracoes de variaveis tipadas
+   - Assertions apropriadas da biblioteca de assertions ProBat
+9. **Gravar arquivo** - Salvar com extensao `.tlpp`
+10. **Relatar** - Mostrar o que foi criado e como executar os testes
+
+## Exemplos
+
+```bash
+# Gerar testes unitarios para um arquivo TLPP
+/advpl-specialist:test src/calculadora.tlpp
+
+# Gerar testes de API para um endpoint REST
+/advpl-specialist:test src/customer_api.tlpp --type api
+
+# Gerar testes com um caminho de saida especifico
+/advpl-specialist:test src/pedido_service.tlpp --output test/unit/test_pedido.tlpp
+
+# Gerar testes para uma funcao especifica
+/advpl-specialist:test U_calculateTotal --type unit
+
+# Gerar testes agrupados em uma suite
+/advpl-specialist:test src/financeiro/ --suite financeiro
+```
+
+## Saida
+
+Um arquivo de teste `.tlpp` completo e compilavel salvo no projeto com:
+
+- Cabecalho `#include "tlpp-probat.th"`
+- Declaracao de namespace apropriada
+- `@TestFixture` com metadados owner e target
+- Metodos de teste com anotacoes `@Test` e nomes descritivos
+- Variaveis locais tipadas
+- Assertions apropriadas (`assertEquals`, `assertTrue`, etc.)
+- Metodos Setup/TearDown quando necessario (`@OneTimeSetUp`, `@Setup`, `@TearDown`, `@OneTimeTearDown`)
+- Retorno `.T.` de todas as funcoes/metodos de teste

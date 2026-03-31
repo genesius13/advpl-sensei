@@ -1,0 +1,207 @@
+---
+title: ADVPL/TLPP Debugging
+description: Metodologia sistematica para diagnosticar e resolver erros em ADVPL/TLPP no TOTVS Protheus
+---
+
+# ADVPL/TLPP Debugging
+
+Metodologia sistematica para diagnosticar e resolver erros em ADVPL/TLPP no TOTVS Protheus. Esta skill cobre erros de compilacao, falhas de runtime, gargalos de performance, locks de banco de dados, analise de logs e troubleshooting do AppServer.
+
+## Quando Usar
+
+- Erros de compilacao (sintaxe, includes faltantes, variaveis nao declaradas)
+- Erros de runtime (acesso NIL, incompatibilidade de tipo, limites de array)
+- Problemas de performance (queries lentas, vazamento de memoria, loops excessivos)
+- Locks de banco de dados (timeout de RecLock, deadlocks, falhas de acesso exclusivo)
+- Analise de logs (console Protheus, logs do AppServer, logs do SmartClient)
+- Problemas do AppServer (crash, alta memoria, esgotamento de threads, problemas de conexao)
+
+## Metodologia de Debug
+
+1. **Erro reportado** - Coletar a mensagem de erro, stack trace e passos de reproducao
+2. **Compilacao?** - Se sim, consultar `common-errors.md` para correcao imediata
+3. **Adicionar logging** - Inserir Conout/FWLogMsg em pontos estrategicos ao redor da falha
+4. **Reproduzir** - Recriar o erro em um ambiente controlado
+5. **Analisar stack** - Ler o stack trace completo, identificar a linha e funcao que falhou
+6. **Identificar causa raiz** - Determinar por que o erro ocorre (dados, logica, ambiente)
+7. **Corrigir** - Aplicar a correcao, validar e remover logging de debug
+
+## Diagnostico Rapido por Tipo de Erro
+
+| Sintoma | Causa Provavel | Primeira Verificacao |
+|---------|----------------|----------------------|
+| Variable does not exist | Local nao declarada ou typo no nome | Verificar se declaracao corresponde ao uso (case-sensitive) |
+| Array access out of bounds | Indice excede `Len(aArray)` ou indice `<= 0` | Adicionar `Conout(Len(aArray))` antes da linha de acesso |
+| Type mismatch on operation | Operando em NIL ou tipo errado | Verificar `ValType()` de ambos operandos antes da linha |
+| File not found / Include error | Arquivo .ch faltando ou RPO errado | Verificar caminhos de `#Include` e compilacao do RPO |
+| Lock timeout (RecLock) | Registro bloqueado por outro usuario/thread | Verificar `RecLock(cAlias, .F.)` com timeout, usar monitor de lock SM0/SMA |
+| Memory allocation error | Array crescendo sem limite ou vazamento de objeto | Verificar loops com `aAdd` sem limite, verificar chamadas `FreeObj()` |
+| Invalid alias XXXX | WorkArea nao aberta ou fechada prematuramente | Verificar se `DbSelectArea()` precede o uso do alias, verificar `Select(cAlias) > 0` |
+
+## Ferramentas de Logging
+
+### Conout (Console Output)
+
+Logging simples de console. Saida aparece no console do AppServer Protheus.
+
+```c
+// Inspecao basica de variaveis
+Conout(">>> [FATA001] cCodCli: " + cValToChar(cCodCli))
+Conout(">>> [FATA001] nTotal: " + cValToChar(nTotal))
+Conout(">>> [FATA001] ValType(xRet): " + ValType(xRet))
+
+// Inspecao de array
+Conout(">>> aItens length: " + cValToChar(Len(aItens)))
+If Len(aItens) > 0
+    Conout(">>> aItens[1]: " + cValToChar(aItens[1]))
+EndIf
+
+// Rastreamento de fluxo
+Conout(">>> Entering FATA001 at " + Time())
+// ... codigo ...
+Conout(">>> Leaving FATA001 at " + Time())
+```
+
+### FWLogMsg (Logging Estruturado - Preferido)
+
+Logging estruturado com niveis de severidade. Logs sao armazenados no sistema de log do Protheus e podem ser consultados.
+
+```c
+// Niveis de severidade: "INFO", "WARNING", "ERROR"
+FWLogMsg("INFO", , "FATA001", "MyModule", "", 01, ;
+    "Processing started for client: " + cCodCli)
+
+FWLogMsg("ERROR", , "FATA001", "MyModule", "", 02, ;
+    "Failed to lock record SA1. Alias: " + cAlias + ;
+    " RecNo: " + cValToChar(RecNo()))
+
+FWLogMsg("WARNING", , "FATA001", "MyModule", "", 03, ;
+    "Slow query detected. Elapsed: " + cValToChar(nElapsed) + "s")
+```
+
+### ErrorBlock para Captura de Stack Trace
+
+Capturar e registrar detalhes completos do erro incluindo a pilha de chamadas.
+
+```c
+Local oError
+Local bOldError := ErrorBlock({|e| oError := e, Break(e)})
+
+Begin Sequence
+
+    // Codigo que pode falhar
+    DbSelectArea("SA1")
+    DbSetOrder(1)
+    DbSeek(xFilial("SA1") + cCodCli)
+    cNome := SA1->A1_NOME
+
+Recover Using oError
+    Conout("=== ERROR CAPTURED ===")
+    Conout("Description: " + oError:Description)
+    Conout("GenCode:     " + cValToChar(oError:GenCode))
+    Conout("SubCode:     " + cValToChar(oError:SubCode))
+    Conout("OsCode:      " + cValToChar(oError:OsCode))
+    Conout("FileName:    " + cValToChar(oError:FileName))
+    Conout("Operation:   " + oError:Operation)
+    Conout("Args:        " + cValToChar(oError:Args))
+    Conout("======================")
+
+End Sequence
+
+ErrorBlock(bOldError)
+```
+
+## Diagnostico de Lock de Banco de Dados
+
+### RecLock com Verificacao de Timeout
+
+Sempre usar `.F.` (espera nao-exclusiva) e verificar o valor de retorno:
+
+```c
+DbSelectArea("SD1")
+DbSetOrder(1)
+
+If DbSeek(xFilial("SD1") + cDoc + cSerie)
+    // Tentar lock com .F. (nao-bloqueante)
+    If RecLock("SD1", .F.)
+        SD1->D1_TOTAL := nNewTotal
+        MsUnlock()
+        Conout(">>> Record updated successfully")
+    Else
+        Conout(">>> ERROR: Could not lock SD1 RecNo " + cValToChar(RecNo()))
+        Conout(">>> Another user/thread may be editing this record")
+    EndIf
+EndIf
+```
+
+### Problemas Comuns de Lock
+
+| Problema | Causa | Correcao |
+|----------|-------|----------|
+| RecLock trava indefinidamente | Usando `RecLock(cAlias, .T.)` - bloqueia para sempre | Usar `RecLock(cAlias, .F.)` e verificar retorno |
+| Lock nao liberado | `MsUnlock()` faltando apos RecLock | Sempre chamar `MsUnlock()` apos escrita |
+| Deadlock entre threads | Duas threads bloqueando registros em ordem diferente | Bloquear registros em ordem consistente, manter locks curtos |
+| Falha de lock exclusivo | Outro processo tem lock compartilhado | Agendar operacoes exclusivas fora do horario de pico |
+
+## Verificacoes Rapidas de Performance
+
+### Indice Errado (DbSetOrder)
+
+Usar o indice errado forca um full table scan:
+
+```c
+// ERRADO - pode usar indice errado ou full scan
+DbSelectArea("SA1")
+DbSetOrder(3) // Indice 3 pode nao corresponder a sua chave de busca
+DbSeek(xFilial("SA1") + cCodCli)
+
+// CORRETO - verificar se o indice corresponde a sua chave
+// Verificar tabela SIX para composicao do indice SA1
+// Indice 1 tipicamente: A1_FILIAL + A1_COD + A1_LOJA
+DbSelectArea("SA1")
+DbSetOrder(1)
+DbSeek(xFilial("SA1") + cCodCli + cLoja)
+```
+
+### Crescimento de Array em Loops
+
+Pre-alocar arrays quando o tamanho e conhecido:
+
+```c
+// LENTO - aAdd realoca memoria a cada iteracao
+Local aResult := {}
+While !Eof()
+    aAdd(aResult, {ALIAS->FIELD1, ALIAS->FIELD2})
+    DbSkip()
+EndDo
+
+// RAPIDO - pre-alocar com aSize
+Local nCount := RecCount() // ou contagem conhecida
+Local aResult := Array(nCount)
+Local nIdx := 0
+While !Eof()
+    nIdx++
+    aResult[nIdx] := {ALIAS->FIELD1, ALIAS->FIELD2}
+    DbSkip()
+EndDo
+aSize(aResult, nIdx) // remover slots nao usados
+```
+
+## Erros Comuns ao Debugar
+
+| Erro | Por que e Errado | Abordagem Melhor |
+|------|-----------------|------------------|
+| Deixar Conout em producao | Inunda console, impacta performance | Usar FWLogMsg com severidade, remover Conouts de debug antes do deploy |
+| Nao salvar ErrorBlock | Sobrescreve handler global de erros | Sempre salvar com `bOld := ErrorBlock(...)` e restaurar depois |
+| Usar MsgAlert para debug | Bloqueia execucao, nao visivel no server | Usar Conout ou FWLogMsg para debug nao-interativo |
+| Ignorar retorno do RecLock | Escreve em registro desbloqueado - corrupcao de dados | Sempre verificar `If RecLock(cAlias, .F.)` |
+| Nao verificar ValType antes de operacoes | Perde valores NIL que causam erros de runtime | Adicionar verificacoes `ValType(xVar) == "C"` antes de operacoes de string |
+| Debugar em ambiente de producao | Risco de corrupcao de dados ou downtime | Reproduzir em ambiente de desenvolvimento/QA primeiro |
+| Nao ler o stack trace completo | Corrige sintoma, nao causa raiz | Ler de baixo para cima: a causa raiz geralmente esta mais profunda na pilha |
+
+## Arquivos de Suporte
+
+Esta skill inclui os seguintes arquivos de referencia:
+
+- **common-errors.md** - Top 50 erros ADVPL/TLPP com causas e solucoes
+- **performance-tips.md** - Tecnicas de otimizacao de performance com exemplos de codigo

@@ -1,0 +1,13 @@
+{
+  "title": "Processos de Negocio",
+  "pages": [
+    "compras",
+    "estoque",
+    "faturamento",
+    "financeiro",
+    "contabilidade",
+    "fiscal",
+    "pcp",
+    "manutencao"
+  ]
+}

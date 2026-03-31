@@ -1,0 +1,64 @@
+---
+title: /diagnose
+description: Diagnostica erros e problemas em codigo ADVPL/TLPP - erros de compilacao, erros de runtime, problemas de performance e analise de logs
+---
+
+# /advpl-specialist:diagnose
+
+Diagnostica e resolve erros e problemas em codigo ADVPL/TLPP.
+
+## Uso
+
+```bash
+/advpl-specialist:diagnose <target> [options]
+```
+
+## Modos
+
+| Modo | Entrada | O que faz |
+|------|---------|-----------|
+| Analise de arquivo | Caminho para arquivo .prw/.tlpp | Varre o codigo em busca de problemas potenciais |
+| Diagnostico de erro | Mensagem de erro entre aspas | Identifica a causa e sugere correcao |
+| Analise de log | Flag --log com caminho do arquivo de log | Analisa log em busca de erros e padroes |
+
+## Opcoes
+
+| Flag | Descricao |
+|------|-----------|
+| `--log` | Caminho para arquivo de log do Protheus para analise |
+| `--verbose` | Mostrar diagnostico detalhado com explicacoes |
+
+## Processo
+
+1. **Identificar modo** - Caminho de arquivo, mensagem de erro ou arquivo de log
+2. **Carregar skill de debugging** - Invocar skill `advpl-debugging`
+3. **Analisar entrada:**
+   - **Arquivo:** Ler codigo e varrer por anti-patterns, tratamento de erros ausente, problemas de lock
+   - **Erro:** Comparar com common-errors.md, depois pesquisar TDN se nao encontrado
+   - **Log:** Analisar por padroes ERROR/WARNING, extrair stack traces
+4. **Reportar achados** - Explicacao clara com niveis de severidade
+5. **Sugerir correcoes** - Alteracoes de codigo especificas com exemplos
+6. **Conselhos preventivos** - Como evitar problemas similares
+
+## Exemplos
+
+```bash
+# Analisar um arquivo-fonte em busca de problemas
+/advpl-specialist:diagnose src/FATA001.prw
+
+# Diagnosticar uma mensagem de erro especifica
+/advpl-specialist:diagnose "THREAD ERROR ([55889]) Variable does not exist: cCodCli"
+
+# Analisar um arquivo de log do Protheus
+/advpl-specialist:diagnose --log /var/protheus/console.log
+
+# Diagnostico verboso com explicacoes completas
+/advpl-specialist:diagnose src/FATA001.prw --verbose
+```
+
+## Saida
+
+- Lista de problemas encontrados com severidade (ERROR, WARNING, INFO)
+- Explicacao da causa raiz para cada problema
+- Correcao especifica de codigo com comparacao antes/depois
+- Recomendacoes preventivas

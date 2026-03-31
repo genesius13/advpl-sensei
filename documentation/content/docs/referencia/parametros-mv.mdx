@@ -1,0 +1,232 @@
+---
+title: Parametros MV
+description: Referencia dos parametros de sistema MV_* do TOTVS Protheus armazenados na tabela SX6
+---
+
+# Parametros MV (SX6)
+
+Os parametros MV (tambem chamados de parametros de sistema) controlam o comportamento dos modulos do Protheus. Eles sao armazenados na tabela **SX6** do dicionario de dados e seguem a convencao de nomenclatura `MV_*` (por exemplo, `MV_ESTADO`, `MV_MOEDA1`, `MV_1DUP`).
+
+---
+
+## O que sao Parametros MV?
+
+Parametros MV sao valores de configuracao do sistema que definem comportamentos padrao, taxas, feature flags, caminhos de arquivos e diversas outras configuracoes. Cada parametro possui:
+
+- **Nome** (`X6_VAR`): Identificador unico, sempre com prefixo `MV_`
+- **Tipo** (`X6_TIPO`): Tipo do valor -- "C" (Caractere), "N" (Numerico), "D" (Data), "L" (Logico)
+- **Conteudo** (`X6_CONTEUD`): Valor armazenado (sempre como caractere internamente)
+- **Descricao** (`X6_DESCRIC`): Descricao do parametro em portugues
+- **Filial** (`X6_FIL`): Codigo da filial (vazio = todas as filiais, ou filial especifica)
+
+---
+
+## Estrutura da Tabela SX6
+
+| Campo | Tipo | Tam | Descricao |
+|-------|------|-----|-----------|
+| X6_FIL | C | 8 | Codigo da filial (vazio = todas as filiais) |
+| X6_VAR | C | 10 | Nome do parametro (ex: "MV_ESTADO", "MV_1DUP") |
+| X6_TIPO | C | 1 | Tipo do valor: "C", "N", "D", "L" |
+| X6_CONTEUD | C | 250 | Valor do parametro (armazenado como caractere) |
+| X6_DESCRIC | C | 60 | Descricao em portugues |
+| X6_DESCSPA | C | 60 | Descricao em espanhol |
+| X6_DESCENG | C | 60 | Descricao em ingles |
+| X6_PROPRI | C | 1 | Flag de modulo proprietario |
+
+---
+
+## Funcoes para Leitura de Parametros
+
+### SuperGetMV (Recomendada)
+
+A funcao mais recomendada para leitura de parametros MV. Utiliza cache para melhor performance e permite definir um valor padrao caso o parametro nao exista.
+
+**Sintaxe:** `SuperGetMV( cParamName [, lHelp [, xDefault]] ) --> xValue`
+
+| Param | Tipo | Descricao |
+|-------|------|-----------|
+| cParamName | C | Nome do parametro |
+| lHelp | L | Exibir help se nao encontrado (padrao: .T.) |
+| xDefault | U | Valor padrao se o parametro nao existir |
+
+```c
+// Leitura com valor padrao (recomendado)
+Local cEstado := SuperGetMV("MV_ESTADO", .F., "SP")
+Local nMoeda  := SuperGetMV("MV_MOEDA1", .F., 1)
+Local nTaxa   := SuperGetMV("MV_TXICMS", .F., 18)
+Local cEmpresa := SuperGetMV("MV_NOMEMP", .F., "Minha Empresa")
+
+// Verificar feature flag
+If SuperGetMV("MV_XMYFEAT", .F., "N") == "S"
+    // Feature habilitada
+EndIf
+```
+
+---
+
+### GetMV (Legado)
+
+Funcao mais antiga para leitura de parametros. Nao possui cache nem valor padrao.
+
+**Sintaxe:** `GetMV( cParamName ) --> xValue`
+
+```c
+Local cEstado := GetMV("MV_ESTADO")
+```
+
+---
+
+### GetNewPar (Alternativa)
+
+Alternativa ao GetMV com suporte a valor padrao.
+
+**Sintaxe:** `GetNewPar( cParamName, xDefault ) --> xValue`
+
+```c
+Local cEstado := GetNewPar("MV_ESTADO", "SP")
+```
+
+---
+
+### PutMV (Escrita)
+
+Grava ou atualiza o valor de um parametro MV na SX6.
+
+**Sintaxe:** `PutMV( cParamName, xValue ) --> NIL`
+
+```c
+PutMV("MV_ESTADO", "RJ")  // Altera o parametro de estado para "RJ"
+```
+
+---
+
+## Leitura Direta da SX6
+
+Em situacoes especiais (como consultas em lote), e possivel acessar a SX6 diretamente:
+
+```c
+// Listar parametros MV por prefixo
+User Function ListMVParams(cPrefix)
+    Local aArea := GetArea()
+
+    DbSelectArea("SX6")
+    DbSetOrder(1) // X6_FIL + X6_VAR
+    DbSeek(xFilial("SX6") + cPrefix)
+
+    While !Eof() .And. Left(AllTrim(SX6->X6_VAR), Len(cPrefix)) == cPrefix
+        ConOut("Param: " + AllTrim(SX6->X6_VAR) + ;
+               " | Type: " + SX6->X6_TIPO + ;
+               " | Value: " + AllTrim(SX6->X6_CONTEUD) + ;
+               " | Desc: " + AllTrim(SX6->X6_DESCRIC))
+        DbSkip()
+    EndDo
+
+    RestArea(aArea)
+Return
+```
+
+---
+
+## Parametros por Filial
+
+Um parametro pode ter valores diferentes por filial. O campo `X6_FIL` determina o escopo:
+
+- **Vazio**: O parametro se aplica a todas as filiais
+- **Codigo da filial**: O parametro se aplica apenas aquela filial
+
+Isso permite que ambientes multi-filial se comportem de forma diferente conforme a filial ativa.
+
+```c
+// O SuperGetMV ja considera a filial ativa automaticamente
+Local cEstado := SuperGetMV("MV_ESTADO", .F., "SP")
+// Retorna o valor especifico da filial, ou o valor geral se nao houver especifico
+```
+
+---
+
+## Casos de Uso Comuns
+
+### Configuracao do Sistema
+
+```c
+// Estado padrao
+Local cEstado := SuperGetMV("MV_ESTADO", .F., "SP")
+
+// Moeda padrao
+Local nMoeda := SuperGetMV("MV_MOEDA1", .F., 1)
+
+// Nome da empresa
+Local cEmpresa := SuperGetMV("MV_NOMEMP", .F., "")
+```
+
+### Feature Flags
+
+```c
+// Parametros customizados como feature toggles
+// Convencao: usar prefixo MV_X para parametros customizados
+If SuperGetMV("MV_XUSARFT", .F., "N") == "S"
+    // Funcionalidade habilitada
+    ProcessNewFeature()
+Else
+    // Funcionalidade desabilitada, usar fluxo antigo
+    ProcessLegacy()
+EndIf
+```
+
+### Taxas e Valores
+
+```c
+// Taxa de ICMS
+Local nICMS := SuperGetMV("MV_TXICMS", .F., 18)
+
+// Percentual de desconto maximo
+Local nDescMax := SuperGetMV("MV_XDSCMAX", .F., 10)
+```
+
+### Caminhos e Configuracoes
+
+```c
+// Caminho para exportacao
+Local cPath := SuperGetMV("MV_XEXPPATH", .F., "\export\")
+
+// Email do administrador
+Local cEmail := SuperGetMV("MV_XADMEML", .F., "admin@empresa.com")
+```
+
+---
+
+## Boas Praticas
+
+1. **Sempre use `SuperGetMV` com valor padrao** em vez de `GetMV`, para evitar erros quando o parametro nao existir e aproveitar o cache.
+
+2. **Use o prefixo `MV_X`** para parametros customizados, evitando conflitos com parametros padrao do sistema.
+
+3. **Documente parametros customizados** criando-os pelo Configurador (SIGACFG) com descricoes claras em portugues, espanhol e ingles.
+
+4. **Evite leituras repetidas** em loops. Leia o parametro uma vez e armazene em variavel local:
+
+```c
+// Correto: leitura unica
+Local nTaxa := SuperGetMV("MV_TXICMS", .F., 18)
+While !Eof()
+    nValor := nBase * nTaxa / 100
+    DbSkip()
+EndDo
+
+// Evitar: leitura dentro do loop
+While !Eof()
+    nValor := nBase * SuperGetMV("MV_TXICMS", .F., 18) / 100  // Ineficiente
+    DbSkip()
+EndDo
+```
+
+5. **Parametros por filial** sao uteis quando diferentes unidades possuem regras fiscais ou operacionais distintas.
+
+---
+
+## Referencia Cruzada
+
+Para mais detalhes sobre a estrutura completa da tabela SX6 e sua relacao com outras tabelas do dicionario de dados, consulte a pagina [Dicionario SX](/docs/referencia/dicionario-sx).
+
+Para funcoes de leitura e escrita de parametros (`SuperGetMV`, `GetMV`, `PutMV`), veja a secao de System Functions na pagina [Funcoes Nativas](/docs/referencia/funcoes-nativas).

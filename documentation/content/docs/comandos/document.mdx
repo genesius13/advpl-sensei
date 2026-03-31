@@ -1,0 +1,64 @@
+---
+title: /document
+description: Gera documentacao tecnica a partir de codigo-fonte ADVPL/TLPP - cabecalhos Protheus.doc, docs de rotinas, docs de APIs
+---
+
+# /advpl-specialist:document
+
+Gera documentacao tecnica a partir de codigo-fonte ADVPL/TLPP existente.
+
+## Uso
+
+```bash
+/advpl-specialist:document <target> [options]
+```
+
+## Opcoes
+
+| Flag | Descricao | Padrao |
+|------|-----------|--------|
+| `--type` | Tipo de documentacao: `header`, `full`, `api` | `full` |
+| `--output` | Caminho do arquivo de saida para a documentacao | Exibir no chat |
+
+## Tipos de Documentacao
+
+| Tipo | O que gera |
+|------|------------|
+| `header` | Bloco de comentario Protheus.doc (pode ser inserido no fonte) |
+| `full` | Documentacao completa da rotina: objetivo, tabelas, MV_*, pontos de entrada, fluxo, dependencias |
+| `api` | Documentacao de API REST: endpoint, parametros, request/response, autenticacao |
+
+## Processo
+
+1. **Analisar argumentos** - Identificar arquivo alvo e opcoes
+2. **Carregar skill de documentacao** - Invocar skill `documentation-patterns`
+3. **Delegar ao agente doc-generator** - Passar alvo e tipo
+4. **Analisar codigo** - Ler fonte, detectar tabelas, parametros, funcoes, dependencias
+5. **Enriquecer** - Cruzar referencia com skills protheus-reference e protheus-business
+6. **Gerar** - Aplicar o template correto com os dados extraidos
+7. **Entregar** - Exibir ou salvar no arquivo de saida
+
+## Exemplos
+
+```bash
+# Gerar documentacao completa da rotina
+/advpl-specialist:document src/MATA461.prw
+
+# Gerar apenas o cabecalho Protheus.doc
+/advpl-specialist:document src/MATA461.prw --type header
+
+# Documentar um endpoint de API REST
+/advpl-specialist:document src/ApiClientes.tlpp --type api
+
+# Salvar documentacao em um arquivo
+/advpl-specialist:document src/MATA461.prw --output docs/MATA461.md
+
+# Documentar todos os arquivos de um diretorio
+/advpl-specialist:document src/
+```
+
+## Saida
+
+- **header:** Bloco de comentario Protheus.doc pronto para inserir
+- **full:** Documento Markdown com objetivo, tabelas, MV_*, pontos de entrada, fluxo, dependencias, historico
+- **api:** Documento Markdown com endpoint, metodo HTTP, parametros, exemplos de request/response, autenticacao

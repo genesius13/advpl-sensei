@@ -1,0 +1,17 @@
+{
+  "title": "Comandos",
+  "pages": [
+    "generate",
+    "review",
+    "migrate",
+    "test",
+    "diagnose",
+    "docs",
+    "process",
+    "explain",
+    "refactor",
+    "document",
+    "changelog",
+    "sxgen"
+  ]
+}

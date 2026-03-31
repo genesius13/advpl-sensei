@@ -1,0 +1,108 @@
+---
+title: /generate
+description: Gera codigo ADVPL/TLPP - funcoes, classes, estruturas MVC, APIs REST, Web Services e pontos de entrada para TOTVS Protheus
+---
+
+# /advpl-specialist:generate
+
+Gera novo codigo ADVPL ou TLPP seguindo as convencoes e boas praticas do Protheus.
+
+## Uso
+
+```bash
+/advpl-specialist:generate <type> [name] [--module <module>]
+```
+
+## Tipos
+
+| Tipo | Descricao | Saida |
+|------|-----------|-------|
+| `function` | User Function | arquivo .prw |
+| `class` | Classe TLPP | arquivo .tlpp |
+| `mvc` | Estrutura MVC (MenuDef, ModelDef, ViewDef) | arquivo .prw |
+| `rest` | Endpoint de API REST | arquivo .prw ou .tlpp |
+| `ponto-entrada` | Ponto de entrada | arquivo .prw |
+| `webservice` | Web Service SOAP | arquivo .prw |
+| `treport` | Relatorio TReport | arquivo .prw |
+| `fwformbrowse` | Tela FWFormBrowse/FWExecView | arquivo .prw |
+| `job` | Job batch / processo agendado | arquivo .prw ou .tlpp |
+| `workflow` | Processo de workflow de aprovacao | arquivo .prw |
+
+## Opcoes
+
+| Flag | Descricao | Padrao |
+|------|-----------|--------|
+| `--module` | Prefixo do modulo (COM, FAT, FIN, etc.) | Pergunta ao usuario |
+| `--lang` | Linguagem: advpl ou tlpp | advpl para function/mvc/pe, tlpp para class |
+| `--output` | Caminho do arquivo de saida | Gerado automaticamente baseado no nome |
+
+## Processo
+
+**OBRIGATORIO: Sempre entra em modo de planejamento antes de gerar codigo. Nunca pula o planejamento.**
+
+### Fase de Planejamento (OBRIGATORIA)
+1. **Analisar argumentos** - Extrair tipo, nome e flags
+2. **Pedir detalhes faltantes** - Se nome ou modulo nao foram fornecidos, perguntar ao usuario
+3. **Pedir requisitos de negocio** - O que o codigo deve fazer?
+4. **Carregar skill** - Invocar skill `advpl-code-generation`
+5. **Carregar padroes** - Ler arquivo de suporte apropriado para o tipo
+6. **Pesquisar TDN para pontos de entrada** - **Se o tipo for `ponto-entrada`**, SEMPRE pesquisa o TDN (TOTVS Developer Network) pelo nome do ponto de entrada antes de gerar codigo. Usa `WebSearch` para encontrar a pagina de documentacao oficial (ex.: pesquisar por `"NOME_PONTO_ENTRADA site:tdn.totvs.com"`). Extrai da pagina do TDN: parametros PARAMIXB (tipos, posicoes, descricoes), tipo e valor de retorno esperado, qual rotina padrao chama esse ponto de entrada e quaisquer ressalvas ou comportamentos especificos de versao.
+7. **Entrar em modo de planejamento** - Usar `EnterPlanMode` para criar um plano estruturado de implementacao
+8. **Apresentar plano** - Mostrar ao usuario um plano claro incluindo:
+   - Arquivo(s) a serem criados (nome, caminho, extensao)
+   - Estrutura do codigo (funcoes, classes, metodos a implementar)
+   - Includes e dependencias
+   - Padroes-chave a aplicar (MVC, REST, SOAP, etc.)
+   - Convencoes de nomenclatura a seguir (notacao hungara, prefixo do modulo)
+   - Tratamento de erros e padroes de operacao com banco de dados
+   - **Para pontos de entrada:** Documentacao do TDN encontrada (parametros PARAMIXB, tipo de retorno, rotina chamadora)
+9. **Aguardar aprovacao** - O usuario deve aprovar o plano antes de qualquer codigo ser escrito. Se o usuario solicitar alteracoes, revisar o plano.
+10. **Sair do modo de planejamento** - Usar `ExitPlanMode` apos aprovacao
+
+### Fase de Implementacao (somente apos aprovacao)
+11. **Gerar codigo** - Criar codigo completo, pronto para producao, seguindo o plano aprovado
+12. **Gravar arquivo** - Salvar com extensao correta (.prw ou .tlpp)
+13. **Relatar** - Mostrar o que foi criado e decisoes-chave
+
+## Exemplos
+
+```bash
+# Criar uma User Function para o modulo de faturamento
+/advpl-specialist:generate function FATA050 --module FAT
+
+# Criar uma classe de servico TLPP
+/advpl-specialist:generate class PedidoService
+
+# Criar CRUD MVC completo
+/advpl-specialist:generate mvc CadProduto --module EST
+
+# Criar um endpoint de API REST
+/advpl-specialist:generate rest ClienteAPI --lang tlpp
+
+# Criar um ponto de entrada
+/advpl-specialist:generate ponto-entrada MT100LOK
+
+# Criar um Web Service SOAP
+/advpl-specialist:generate webservice WSPedido
+
+# Criar um relatorio TReport
+/advpl-specialist:generate treport RelProdutos --module EST
+
+# Criar uma tela FWFormBrowse
+/advpl-specialist:generate fwformbrowse CadFornecedores --module COM
+
+# Criar um job de processamento em lote
+/advpl-specialist:generate job JobProcessaNotas --module FAT
+
+# Criar um workflow de aprovacao
+/advpl-specialist:generate workflow AprovacaoPedido --module COM
+```
+
+## Saida
+
+Um arquivo-fonte completo e compilavel salvo no diretorio do projeto com:
+- Cabecalho de documentacao Protheus.doc
+- Includes/declaracoes de namespace apropriados
+- Implementacao completa seguindo convencoes
+- Tratamento de erros
+- Save/restore de area para operacoes com banco de dados

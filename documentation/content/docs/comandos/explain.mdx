@@ -1,0 +1,57 @@
+---
+title: /explain
+description: Explica codigo ADVPL/TLPP em linguagem simples para desenvolvedores e consultores funcionais
+---
+
+# /advpl-specialist:explain
+
+Explica codigo ADVPL/TLPP em linguagem simples, adaptado ao nivel do publico.
+
+## Uso
+
+```bash
+/advpl-specialist:explain <target> [--level level]
+```
+
+## Niveis
+
+| Nivel | Publico | Saida |
+|-------|---------|-------|
+| `junior` | Dev iniciante | Explicacao detalhada, linha por linha, sem assumir conhecimento previo |
+| `senior` | Dev experiente | Resumo focado na logica de negocio e decisoes de design |
+| `funcional` | Consultor funcional | Explicacao sem termos tecnicos, foco no impacto no negocio |
+
+Se `--level` nao for fornecido, o padrao e `junior`.
+
+## Processo
+
+1. **Analisar argumentos** - Identificar arquivo/trecho alvo e nivel
+2. **Carregar skill de explicacao** - Invocar skill `code-explanation`
+3. **Ler codigo alvo** - Ler o arquivo ou interpretar o trecho
+4. **Carregar skills de suporte** - Carregar `protheus-reference`, `protheus-business`, `embedded-sql` conforme necessario
+5. **Analisar codigo** - Identificar estrutura, funcoes, variaveis, operacoes de banco, regras de negocio
+6. **Gerar explicacao** - Seguir a estrutura apropriada ao nivel do skill
+7. **Apresentar resultado** - Explicacao clara e estruturada no idioma do usuario
+
+## Exemplos
+
+```bash
+# Explicar codigo para um desenvolvedor junior (padrao)
+/advpl-specialist:explain src/MATA461.prw
+
+# Explicar para um consultor funcional
+/advpl-specialist:explain src/CustomFaturamento.prw --level funcional
+
+# Explicar para um desenvolvedor senior
+/advpl-specialist:explain src/JobProcessaNF.tlpp --level senior
+
+# Explicar uma funcao especifica
+/advpl-specialist:explain src/Utils.prw::fCalcDesconto
+```
+
+## Saida
+
+Explicacao estruturada adaptada ao publico:
+- **Junior:** Objetivo, includes, variaveis, fluxo passo a passo, funcoes nativas utilizadas, tabelas, avisos
+- **Senior:** Objetivo, logica de negocio, tabelas, dependencias, riscos
+- **Funcional:** O que faz, quando executa, quais dados le/altera, regras de negocio, impacto no modulo

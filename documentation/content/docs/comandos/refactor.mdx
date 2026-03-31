@@ -1,0 +1,62 @@
+---
+title: /refactor
+description: Refatora codigo ADVPL/TLPP - extrai funcoes, simplifica logica, remove codigo morto, melhora nomenclatura
+---
+
+# /advpl-specialist:refactor
+
+Analisa e refatora codigo ADVPL/TLPP para melhorar a estrutura sem alterar o comportamento.
+
+## Uso
+
+```bash
+/advpl-specialist:refactor <target> [options]
+```
+
+## Opcoes
+
+| Flag | Descricao | Padrao |
+|------|-----------|--------|
+| `--dry-run` | Mostrar sugestoes sem aplicar alteracoes | false |
+
+## Padroes de Refatoracao
+
+| ID | Padrao | Risco |
+|----|--------|-------|
+| RF-001 | Extrair Funcao (>100 linhas) | Baixo |
+| RF-002 | Simplificar Condicionais (>3 niveis) | Baixo |
+| RF-003 | Remover Codigo Morto | Baixo |
+| RF-004 | Melhorar Nomenclatura (notacao hungara) | Baixo |
+| RF-005 | Eliminar Duplicacao | Medio |
+| RF-006 | Reduzir Parametros (>5 params) | Medio |
+
+## Processo
+
+**OBRIGATORIO: Sempre entra em modo de planejamento antes de aplicar alteracoes. Nunca refatora sem aprovacao.**
+
+1. **Analisar argumentos** - Identificar arquivo(s) alvo e flags
+2. **Carregar skill de refatoracao** - Invocar skill `advpl-refactoring`
+3. **Delegar ao agente refactorer** - Passar alvo e opcoes para o agente refactorer
+4. **Apresentar plano** - Lista estruturada de refatoracoes com antes/depois para cada uma
+5. **Aguardar aprovacao** - O usuario deve aprovar antes das alteracoes serem aplicadas
+6. **Aplicar alteracoes** - Uma refatoracao por vez (a menos que --dry-run)
+7. **Relatar** - Resumo das alteracoes aplicadas
+
+## Exemplos
+
+```bash
+# Refatorar um arquivo-fonte (interativo, com aprovacao)
+/advpl-specialist:refactor src/FATA001.prw
+
+# Mostrar sugestoes sem aplicar
+/advpl-specialist:refactor src/FATA001.prw --dry-run
+
+# Refatorar todos os arquivos de um diretorio
+/advpl-specialist:refactor src/
+```
+
+## Saida
+
+- Lista de oportunidades de refatoracao encontradas, ordenadas por prioridade
+- Codigo antes/depois para cada sugestao
+- Resumo de melhorias (contagem de funcoes, tamanho maximo, conformidade de nomenclatura)

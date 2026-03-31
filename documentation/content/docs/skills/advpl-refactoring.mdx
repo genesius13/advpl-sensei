@@ -1,0 +1,137 @@
+---
+title: ADVPL/TLPP Refactoring
+description: Padroes e regras para refatoracao segura de codigo ADVPL/TLPP no TOTVS Protheus
+---
+
+# ADVPL/TLPP Refactoring
+
+Padroes e regras para refatoracao segura de codigo ADVPL/TLPP no TOTVS Protheus. Foca em melhorar a estrutura do codigo sem alterar o comportamento.
+
+## Quando Usar
+
+- Funcoes muito longas (>100 linhas)
+- Codigo duplicado entre arquivos ou funcoes
+- Condicionais aninhados complexos (>3 niveis de profundidade)
+- Variaveis com nomes pouco claros
+- Codigo morto (blocos inalcancaveis, variaveis/funcoes nao usadas)
+- Funcoes "deus" que fazem coisas demais
+
+## Padroes de Refatoracao
+
+### RF-001: Extrair Funcao (Complexidade: BAIXA)
+
+**Detectar:** Corpo da funcao > 100 linhas com blocos logicos identificaveis
+**Acao:** Extrair bloco logico em uma nova Static Function
+**Regra:** A funcao extraida deve receber todos os dados necessarios como parametros (sem Private/Public compartilhados)
+
+Antes:
+```c
+User Function ProcessaPedido()
+    // ... 40 linhas validando dados ...
+    // ... 30 linhas calculando totais ...
+    // ... 50 linhas salvando no banco ...
+Return
+```
+
+Depois:
+```c
+User Function ProcessaPedido()
+    If !fValidaDados(cCodPed)
+        Return .F.
+    EndIf
+    nTotal := fCalculaTotais(cCodPed)
+    lOk := fGravaPedido(cCodPed, nTotal)
+Return lOk
+
+Static Function fValidaDados(cCodPed)
+    // 40 linhas
+Return lValido
+
+Static Function fCalculaTotais(cCodPed)
+    // 30 linhas
+Return nTotal
+
+Static Function fGravaPedido(cCodPed, nTotal)
+    // 50 linhas
+Return lOk
+```
+
+### RF-002: Simplificar Condicionais (Complexidade: BAIXA)
+
+**Detectar:** If aninhado > 3 niveis de profundidade, ou cadeias longas de If/ElseIf
+**Acao:** Usar early return, guard clauses ou Do Case
+
+Antes:
+```c
+If lCondicao1
+    If lCondicao2
+        If lCondicao3
+            // codigo principal
+        EndIf
+    EndIf
+EndIf
+```
+
+Depois:
+```c
+If !lCondicao1
+    Return
+EndIf
+If !lCondicao2
+    Return
+EndIf
+If !lCondicao3
+    Return
+EndIf
+// codigo principal
+```
+
+### RF-003: Remover Codigo Morto (Complexidade: BAIXA)
+
+**Detectar:** Variaveis declaradas mas nunca usadas, codigo inalcancavel apos Return, blocos comentados
+**Acao:** Remover o codigo morto completamente
+**Regra:** Usar Grep para verificar se a variavel/funcao nao e chamada de outros arquivos antes de remover
+
+### RF-004: Melhorar Nomenclatura (Complexidade: BAIXA)
+
+**Detectar:** Variaveis sem notacao hungara, nomes de uma letra (exceto contadores de loop), nomes pouco claros
+**Acao:** Renomear seguindo convencao de notacao hungara
+
+| Tipo | Prefixo | Exemplo |
+|------|---------|---------|
+| Character | c | cNomeCli, cCodProd |
+| Numeric | n | nValor, nQtde |
+| Logical | l | lOk, lContinua |
+| Date | d | dDataIni, dEmissao |
+| Array | a | aDados, aItens |
+| Object | o | oModel, oReport |
+| Block | b | bBloco, bFiltro |
+
+### RF-005: Eliminar Duplicacao (Complexidade: MEDIA)
+
+**Detectar:** Dois ou mais blocos de codigo com >5 linhas similares
+**Acao:** Extrair logica comum em uma funcao compartilhada
+**Regra:** Somente extrair se a logica e realmente identica, nao apenas visualmente similar
+
+### RF-006: Reduzir Parametros da Funcao (Complexidade: MEDIA)
+
+**Detectar:** Funcoes com >5 parametros
+**Acao:** Agrupar parametros relacionados em um objeto JSON ou array
+**Regra:** Somente aplicar se os parametros sao logicamente relacionados
+
+## Processo de Refatoracao
+
+1. **Analisar** - Ler o arquivo, identificar oportunidades de refatoracao
+2. **Priorizar** - Ordenar por impacto: remocao de codigo morto primeiro, depois nomenclatura, depois extracao
+3. **Apresentar plano** - Mostrar cada refatoracao com antes/depois
+4. **Aguardar aprovacao** - Usuario deve aprovar antes das mudancas serem aplicadas
+5. **Aplicar mudancas** - Uma refatoracao por vez
+6. **Verificar** - Garantir que a estrutura do codigo esta correta apos cada mudanca
+
+## Regras de Seguranca
+
+- NUNCA alterar logica de negocio durante refatoracao
+- NUNCA renomear variaveis Public/Private que podem ser usadas externamente
+- SEMPRE verificar chamadores externos antes de remover funcoes (usar Grep)
+- SEMPRE preservar a assinatura da funcao (parametros e tipo de retorno)
+- Se nao tiver certeza se o comportamento vai mudar, NAO refatorar - sinalizar como sugestao apenas

@@ -1,0 +1,97 @@
+---
+title: Changelog Patterns
+description: Padroes para gerar changelogs estruturados a partir de mudancas em codigo ADVPL/TLPP no TOTVS Protheus
+---
+
+# Changelog Patterns
+
+Padroes para gerar changelogs estruturados a partir de mudancas em codigo ADVPL/TLPP no TOTVS Protheus. Analisa diffs, identifica tipos de mudanca e produz release notes formatadas.
+
+## Quando Usar
+
+- Gerar changelog para uma entrega ao cliente
+- Criar release notes para um patch ou atualizacao
+- Documentar o que mudou entre versoes
+- Auditar mudancas de codigo para conformidade
+
+## Tipos de Mudanca
+
+| Tipo | Label | Descricao |
+|------|-------|-----------|
+| NEW | [NOVO] | Nova funcionalidade ou rotina |
+| FIX | [CORRECAO] | Correcao de bug |
+| CHANGE | [ALTERACAO] | Melhoria ou modificacao de comportamento existente |
+| REMOVE | [REMOCAO] | Funcionalidade ou codigo removido |
+| REFACTOR | [REFATORACAO] | Mudanca estrutural sem alterar comportamento |
+
+## Niveis de Impacto
+
+| Nivel | Descricao |
+|-------|-----------|
+| ALTO | Altera fluxo de negocio, tabelas, ou integracao entre modulos |
+| MEDIO | Altera validacoes, calculos, ou comportamento de rotina existente |
+| BAIXO | Mudanca cosmetica, refatoracao, ou correcao pontual |
+
+## Formato do Changelog -- Markdown
+
+```markdown
+# Changelog -- [Nome do Projeto/Pacote]
+Data: DD/MM/YYYY
+Versao: X.Y.Z
+
+## Resumo
+[1-2 frases descrevendo o escopo das mudancas]
+
+## Alteracoes
+
+### [NOVO] Descricao da nova funcionalidade
+- **Arquivo:** CadOrdemServico.prw
+- **Impacto:** ALTO
+- **Detalhes:** Cadastro MVC de Ordens de Servico com tabela customizada ZA1
+- **Tabelas afetadas:** ZA1 (nova)
+
+### [CORRECAO] Descricao do bug corrigido
+- **Arquivo:** MATA461.prw:145
+- **Impacto:** MEDIO
+- **Detalhes:** RecLock sem MsUnlock causava lock permanente na SF2
+- **Tabelas afetadas:** SF2
+
+### [ALTERACAO] Descricao da melhoria
+- **Arquivo:** RelVendas.prw
+- **Impacto:** BAIXO
+- **Detalhes:** Adicionada coluna de desconto no relatorio
+- **Tabelas afetadas:** SC6 (leitura)
+```
+
+## Formato do Changelog -- TXT (texto puro)
+
+```
+CHANGELOG -- [Nome do Projeto/Pacote]
+Data: DD/MM/YYYY | Versao: X.Y.Z
+============================================
+
+RESUMO: [1-2 frases]
+
+[NOVO] Descricao
+  Arquivo: CadOrdemServico.prw
+  Impacto: ALTO
+  Tabelas: ZA1 (nova)
+
+[CORRECAO] Descricao
+  Arquivo: MATA461.prw:145
+  Impacto: MEDIO
+  Tabelas: SF2
+```
+
+## Processo de Analise
+
+1. Obter a lista de arquivos alterados (git diff, lista de arquivos ou input do usuario)
+2. Para cada arquivo alterado:
+   - Ler a versao atual
+   - Se git disponivel, obter o diff (git diff &lt;since&gt; -- &lt;file&gt;)
+   - Identificar o que mudou: funcoes novas, funcoes modificadas, funcoes removidas
+   - Detectar tabelas afetadas (DBSelectArea, RecLock, padrao BeginSQL)
+   - Classificar o tipo de mudanca (NEW, FIX, CHANGE, REMOVE, REFACTOR)
+   - Avaliar nivel de impacto (ALTO, MEDIO, BAIXO)
+3. Agrupar mudancas por tipo
+4. Gerar changelog no formato solicitado

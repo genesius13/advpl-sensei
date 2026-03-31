@@ -1,0 +1,47 @@
+#!/usr/bin/env bash
+
+# advpl-specialist SessionStart hook
+# Detects ADVPL/TLPP project files and activates plugin context
+
+FOUND=0
+COUNTS=""
+
+# Check for ADVPL/TLPP files in current directory (max depth 3 for performance)
+PRW_COUNT=$(find . -maxdepth 3 -name "*.prw" -type f 2>/dev/null | head -50 | wc -l | tr -d ' ')
+TLPP_COUNT=$(find . -maxdepth 3 -name "*.tlpp" -type f 2>/dev/null | head -50 | wc -l | tr -d ' ')
+PRX_COUNT=$(find . -maxdepth 3 -name "*.prx" -type f 2>/dev/null | head -50 | wc -l | tr -d ' ')
+CH_COUNT=$(find . -maxdepth 3 -name "*.ch" -type f 2>/dev/null | head -50 | wc -l | tr -d ' ')
+
+if [ "$PRW_COUNT" -gt 0 ] || [ "$TLPP_COUNT" -gt 0 ] || [ "$PRX_COUNT" -gt 0 ] || [ "$CH_COUNT" -gt 0 ]; then
+    FOUND=1
+    [ "$PRW_COUNT" -gt 0 ] && COUNTS="$COUNTS $([ "$PRW_COUNT" -ge 50 ] && echo '50+' || echo "$PRW_COUNT") .prw"
+    [ "$TLPP_COUNT" -gt 0 ] && COUNTS="$COUNTS $([ "$TLPP_COUNT" -ge 50 ] && echo '50+' || echo "$TLPP_COUNT") .tlpp"
+    [ "$PRX_COUNT" -gt 0 ] && COUNTS="$COUNTS $([ "$PRX_COUNT" -ge 50 ] && echo '50+' || echo "$PRX_COUNT") .prx"
+    [ "$CH_COUNT" -gt 0 ] && COUNTS="$COUNTS $([ "$CH_COUNT" -ge 50 ] && echo '50+' || echo "$CH_COUNT") .ch"
+fi
+
+if [ "$FOUND" -eq 1 ]; then
+    echo "ADVPL/TLPP project detected (${COUNTS# }). advpl-specialist plugin is active."
+    echo ""
+    echo "Available commands:"
+    echo "  /advpl-specialist:generate  - Generate ADVPL/TLPP code"
+    echo "  /advpl-specialist:migrate   - Migrate ADVPL to TLPP"
+    echo "  /advpl-specialist:diagnose  - Diagnose errors"
+    echo "  /advpl-specialist:docs      - Look up documentation"
+
+    # Check if superpowers plugin is installed
+    SUPERPOWERS_DIR="$HOME/.claude/plugins/cache/claude-plugins-official/superpowers"
+    if [ ! -d "$SUPERPOWERS_DIR" ]; then
+        echo ""
+        echo "Recommended: Install the 'superpowers' plugin for better planning, debugging and code review:"
+        echo "  /plugin marketplace add anthropics/claude-code-plugins"
+        echo "  /plugin install superpowers@anthropics-claude-code-plugins"
+    fi
+
+    # Check if Playwright MCP is available (used as fallback for web documentation access)
+    if ! claude mcp list 2>/dev/null | grep -q "playwright"; then
+        echo ""
+        echo "Recommended: Install the 'playwright' MCP server for reliable documentation access (fallback when WebFetch/WebSearch fail):"
+        echo "  claude mcp add playwright -- npx @anthropic-ai/mcp-playwright@latest"
+    fi
+fi

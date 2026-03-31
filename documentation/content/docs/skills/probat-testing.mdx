@@ -1,0 +1,226 @@
+---
+title: ProBat Testing
+description: Geracao de testes unitarios ProBat para classes e funcoes TLPP no TOTVS Protheus
+---
+
+# ProBat Testing
+
+ProBat e o motor de testes unitarios nativo do tlppCore para criar e executar testes em programas TLPP no TOTVS Protheus. O nome vem do Latim e significa "prova/testes". Suporta testes unitarios, funcionais e de integracao, analise de cobertura de codigo, workflows TDD e integracao CI/CD.
+
+> **ProBat so funciona com TLPP.** Testes para fontes ADVPL tambem devem ser escritos em TLPP. Se o codigo alvo e `.prw`, o arquivo de teste ainda e `.tlpp`.
+
+## Include Obrigatorio
+
+Todo arquivo de teste deve incluir o header ProBat:
+
+```c
+#include "tlpp-probat.th"
+```
+
+Se usar features do tlppCore (JsonObject, REST, etc.), incluir tambem:
+
+```c
+#include "tlpp-core.th"
+#include "tlpp-probat.th"
+```
+
+## Convencao de Namespace
+
+Namespaces de teste seguem o padrao `test.<module>` ou `custom.tests.<module>`:
+
+```c
+namespace test.financeiro
+namespace custom.tests.faturamento
+```
+
+## Anotacoes
+
+### @TestFixture
+
+Marca uma funcao ou classe como fixture de teste. Esta e a **unica** forma do ProBat descobrir codigo de teste.
+
+```c
+// Minimo
+@TestFixture()
+
+// Com propriedades
+@TestFixture(owner='team_name')
+@TestFixture(owner='team_name', target='source_file.tlpp')
+@TestFixture(owner='team_name', suite='suite_name')
+@TestFixture(priority=1)
+@TestFixture(runWithAll=.F.)  // Excluir do modo "executar todos"
+@TestFixture(rwa=.F.)        // Alias curto para runWithAll
+```
+
+| Propriedade | Tipo | Descricao |
+|-------------|------|-----------|
+| `owner` | Character | Identificador do time ou autor |
+| `target` | Character | Arquivo fonte sendo testado (para rastreabilidade) |
+| `suite` | Character | Nome da suite (para execucao agrupada) |
+| `priority` | Numeric | Ordem de execucao (menor = primeiro) |
+| `runWithAll` / `rwa` | Logical | Se `.F.`, teste e excluido do modo "executar todos" |
+
+### @Test
+
+Marca um metodo em uma classe `@TestFixture` como um teste a executar. O parametro de descricao e **obrigatorio**.
+
+```c
+@Test('descricao do que esta sendo testado')
+public method myTestMethod()
+```
+
+> Se uma classe tem `@TestFixture` mas nenhum metodo com `@Test`, o resultado sera SKIPPED.
+
+### @OneTimeSetUp (executa uma vez antes de todos os testes)
+
+Marca um metodo para executar **uma vez** antes de todos os metodos `@Test` na classe.
+
+```c
+@OneTimeSetUp()
+public method initDatabase()
+```
+
+### @Setup (executa antes de cada teste)
+
+Marca um metodo para executar **antes de cada** metodo `@Test`.
+
+```c
+@Setup()
+public method resetState()
+```
+
+### @TearDown (executa apos cada teste)
+
+Marca um metodo para executar **apos cada** metodo `@Test`.
+
+```c
+@TearDown()
+public method cleanupState()
+```
+
+### @OneTimeTearDown (executa uma vez apos todos os testes)
+
+Marca um metodo para executar **uma vez** apos todos os metodos `@Test` na classe.
+
+```c
+@OneTimeTearDown()
+public method closeConnections()
+```
+
+### @Skip
+
+Pula uma fixture de teste inteira (funcao ou classe) ou um metodo especifico. Suporta filtros condicionais.
+
+```c
+// Pular incondicionalmente
+@Skip()
+
+// Pular com filtros
+@Skip(system="windows")
+@Skip(appServerName="HARPIA")
+@Skip(tlppVersion=">= 01.02.10")
+@Skip(system="windows", appServerName="HARPIA", tlppVersion=">= 01.02.10")
+```
+
+### @ErrorLog
+
+Marca um teste que espera produzir um erro. O teste passa se o erro especificado ocorrer.
+
+```c
+@Test('teste que espera um erro')
+@ErrorLog('type mismatch')
+public method testExpectedError()
+```
+
+### SKIPASSERT (comando inline)
+
+Pula apenas a proxima assertion. Util para skip condicional dentro de um teste.
+
+```c
+SKIPASSERT
+assertError('this assert will be skipped')
+
+// Com filtros
+SKIPASSERT TLPPVERSION ">= 01.02.10"
+SKIPASSERT SYSTEM "windows"
+SKIPASSERT APPSERVERNAME "HARPIA"
+```
+
+## Funcoes de Assertion
+
+Todas as assertions pertencem ao namespace `tlpp.probat`. Podem ser chamadas usando a diretiva de namespace ou com o nome completo qualificado.
+
+```c
+// Opcao 1: using namespace
+using namespace tlpp.probat
+assertEquals(xValue, xExpected, 'descricao')
+
+// Opcao 2: nome completo qualificado
+tlpp.probat.assertEquals(xValue, xExpected, 'descricao')
+```
+
+### Referencia Completa de Assertions
+
+| Funcao | Assinatura | Descricao |
+|--------|-----------|-----------|
+| `assertEquals` | `(xValue, xExpected [, cDesc])` | Valores devem ser iguais |
+| `assertNotEquals` | `(xValue, xExpected [, cDesc])` | Valores devem ser diferentes |
+| `assertTrue` | `(lValue [, cDesc])` | Valor deve ser `.T.` |
+| `assertFalse` | `(lValue [, cDesc])` | Valor deve ser `.F.` |
+| `assertGreater` | `(xValue, xCompare [, cDesc])` | Valor deve ser maior que esperado |
+| `assertGreaterOrEqual` | `(xValue, xCompare [, cDesc])` | Valor deve ser maior ou igual ao esperado |
+| `assertLess` | `(xValue, xCompare [, cDesc])` | Valor deve ser menor que esperado |
+| `assertLessOrEqual` | `(xValue, xCompare [, cDesc])` | Valor deve ser menor ou igual ao esperado |
+| `assertNil` | `(xValue [, cDesc])` | Valor deve ser NIL |
+| `assertVector` | `(aValue, aExpected [, cDesc])` | Arrays devem ser iguais |
+| `assertJson` | `(xValue, xExpected [, cDesc])` | Objetos/strings JSON devem ser iguais |
+| `assertIsRegExFull` | `(cValue, cPattern [, cDesc])` | String deve corresponder totalmente ao regex |
+| `assertIsRegExPartial` | `(cValue, cPattern [, cDesc])` | String deve corresponder parcialmente ao regex |
+| `assertIsContained` | `(cValue, cSearch [, cDesc])` | String deve conter o valor de busca |
+| `assertOK` | `(cDesc)` | Registra um resultado positivo (sempre passa) |
+| `assertError` | `(cDesc)` | Registra um resultado negativo (sempre falha) |
+| `assertWarning` | `(cDesc)` | Registra um aviso (sem impacto em passa/falha) |
+
+## Ciclo de Vida de Execucao (Baseado em Classe)
+
+```
+Constructor (new)
+  |
+  +-- @OneTimeSetUp methods (uma vez)
+        |
+        +-- @Setup methods (antes de cada teste)
+        |     |
+        |     +-- @Test method
+        |     |
+        |     +-- @TearDown methods (apos cada teste)
+        |
+        +-- @Setup methods (antes de cada teste)
+        |     |
+        |     +-- @Test method
+        |     |
+        |     +-- @TearDown methods (apos cada teste)
+        |
+        +-- @OneTimeTearDown methods (uma vez)
+```
+
+## Execucao de Testes
+
+### Via REST API (programatico)
+
+Testes podem ser descobertos e executados usando a REST API do ProBat ou pelo runner principal. Consulte o repositorio oficial `tlpp-probat-samples` para exemplos de execucao baseada em script.
+
+### Via Extensao VSCode
+
+TOTVS fornece uma extensao VSCode para ProBat que integra descoberta e execucao de testes diretamente no editor.
+
+## Arquivos de Suporte
+
+Esta skill inclui o seguinte arquivo de referencia:
+
+- **patterns-unit-tests.md** - Templates e padroes para escrever testes ProBat
+
+## Referencias Externas
+
+- [Repositorio oficial de exemplos](https://github.com/totvs/tlpp-probat-samples) - Exemplos oficiais de ProBat da TOTVS
+- [TDN ProBat](https://tdn.totvs.com/display/tec/PROBAT) - Documentacao oficial no TOTVS Developer Network
+- [TDN Asserts](https://tdn.totvs.com/display/tec/d+-+Asserts) - Referencia das funcoes de assertion

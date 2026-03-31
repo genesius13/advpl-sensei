@@ -1,0 +1,75 @@
+---
+title: Protheus Business Processes
+description: Guia de referencia para processos de negocio do ERP TOTVS Protheus - modulos, rotinas, tabelas e integracoes
+---
+
+# Protheus Business Processes
+
+Guia de referencia para processos de negocio do ERP TOTVS Protheus. Fornece entendimento de como cada modulo funciona, suas rotinas, tabelas, regras de negocio e como os modulos se integram entre si.
+
+## Quando Usar
+
+- Entender processos de negocio dentro de um modulo do Protheus
+- Consultar funcoes, rotinas e workflows de um modulo
+- Encontrar quais tabelas e campos um processo usa
+- Entender integracoes ERP entre modulos
+- Perguntas como "como funciona o faturamento?", "quais tabelas o compras usa?", "como compras e estoque se integram?"
+
+## Indice de Modulos
+
+| Modulo | Prefixo | Arquivo de Referencia |
+|--------|---------|----------------------|
+| Compras | COM | modulo-compras.md |
+| Estoque | EST | modulo-estoque.md |
+| Faturamento | FAT | modulo-faturamento.md |
+| Financeiro | FIN | modulo-financeiro.md |
+| Contabilidade | CTB | modulo-contabilidade.md |
+| Fiscal | FIS | modulo-fiscal.md |
+| PCP | PCP | modulo-pcp.md |
+| Manutencao de Ativos | MNT | modulo-manutencao.md |
+
+## Estrategia de Consulta
+
+1. **Identificar modulo(s):** Determinar a qual(is) modulo(s) a consulta se relaciona usando o Indice de Modulos acima
+2. **Local primeiro:** Verificar o arquivo de referencia do modulo correspondente (ex.: modulo-compras.md)
+3. **Fallback online:** Pesquisar TDN com `WebSearch` usando query: `site:tdn.totvs.com <modulo> <processo> protheus`
+4. **WebFetch da pagina TDN:** Se URL encontrada, usar `WebFetch` para extrair detalhes
+5. **Fallback Playwright:** Se `WebSearch` ou `WebFetch` falhar, usar Playwright MCP para navegar e capturar informacoes do TDN
+
+## Formato de Resposta
+
+Adaptativo baseado no tipo de consulta:
+
+| Tipo de Consulta | Estrutura de Resposta |
+|-----------------|----------------------|
+| Processo | Descricao -> Rotinas -> Tabelas/Campos -> Fluxo passo a passo -> Integracoes -> Pontos de entrada |
+| Rotina | O que faz -> Tabelas que movimenta -> Parametros -> Processo a que pertence |
+| Modulo | Visao geral -> Tabelas principais -> Rotinas principais -> Processos-chave -> Integracoes |
+| Integracao | Fluxo entre modulos -> Tabelas de ligacao -> Rotinas envolvidas |
+
+## Dicas de Pesquisa Online
+
+Ao pesquisar no TDN (TOTVS Developer Network):
+- Usar `WebSearch` com query: `site:tdn.totvs.com <modulo> <processo> protheus`
+- Para docs de rotina: `site:tdn.totvs.com <nome_rotina> advpl protheus`
+- Para integracao de modulos: `site:tdn.totvs.com integracao <modulo_a> <modulo_b> protheus`
+- URL base do TDN: `https://tdn.totvs.com`
+
+## Referencias Cruzadas
+
+- **protheus-reference** -- para detalhes de funcoes nativas (sintaxe, parametros, retorno)
+- **advpl-code-generation** -- para padroes de codigo e templates
+- **embedded-sql** -- para exemplos de query usando Embedded SQL
+
+## Arquivos de Suporte
+
+Esta skill inclui arquivos de referencia detalhados para cada modulo:
+
+- **modulo-compras.md** - Processos de negocio do modulo de Compras
+- **modulo-contabilidade.md** - Processos de negocio do modulo de Contabilidade
+- **modulo-estoque.md** - Processos de negocio do modulo de Estoque
+- **modulo-faturamento.md** - Processos de negocio do modulo de Faturamento
+- **modulo-financeiro.md** - Processos de negocio do modulo Financeiro
+- **modulo-fiscal.md** - Processos de negocio do modulo Fiscal
+- **modulo-manutencao.md** - Processos de negocio do modulo de Manutencao de Ativos
+- **modulo-pcp.md** - Processos de negocio do modulo PCP

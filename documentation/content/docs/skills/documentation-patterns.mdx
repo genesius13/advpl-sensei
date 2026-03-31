@@ -1,0 +1,164 @@
+---
+title: Documentation Patterns
+description: Padroes e templates para gerar documentacao tecnica a partir de codigo-fonte ADVPL/TLPP no TOTVS Protheus
+---
+
+# Documentation Patterns
+
+Padroes e templates para gerar documentacao tecnica a partir de codigo-fonte ADVPL/TLPP no TOTVS Protheus.
+
+## Quando Usar
+
+- Gerar cabecalhos Protheus.doc para funcoes/classes
+- Criar documentacao de rotina (tabelas, parametros, pontos de entrada, fluxo)
+- Documentar endpoints de API REST
+- Adicionar documentacao a codigo legado nao documentado
+
+## Tipos de Documentacao
+
+### Tipo: header -- Cabecalho Protheus.doc
+
+Cabecalho de documentacao padrao seguindo convencoes TOTVS:
+
+```c
+/*/{Protheus.doc} NomeFuncao
+Descricao breve do que a funcao faz.
+
+@type        User Function | Static Function | Method
+@author      Nome do autor
+@since       DD/MM/YYYY
+@version     1.0
+
+@param       cParam1, Character, Descricao do parametro 1
+@param       nParam2, Numeric, Descricao do parametro 2
+
+@return      Tipo, Descricao do retorno
+
+@example
+    cResult := NomeFuncao("ABC", 123)
+
+@see         FuncaoRelacionada1, FuncaoRelacionada2
+
+@obs         Observacoes adicionais
+
+@history     DD/MM/YYYY, Autor, Descricao da alteracao
+/*/
+```
+
+Campos:
+- **@type**: User Function, Static Function, Method, Main Function
+- **@author**: Extraido do git blame ou input do usuario
+- **@since**: Data de criacao (do git log ou data atual)
+- **@param**: Uma linha por parametro com nome, tipo, descricao
+- **@return**: Tipo de retorno e descricao
+- **@example**: Exemplo de uso
+- **@see**: Funcoes relacionadas (detectadas a partir de chamadas de funcao no codigo)
+- **@history**: Historico de alteracoes (do git log se disponivel)
+
+### Tipo: full -- Documentacao Completa de Rotina
+
+```markdown
+# NomeDaRotina
+
+## Objetivo
+[O que essa rotina faz em 1-2 frases]
+
+## Tipo
+[User Function | Static Function | Class Method | Job | Entry Point]
+
+## Modulo
+[COM | FAT | FIN | EST | CTB | FIS | PCP | MNT]
+
+## Tabelas
+
+### Leitura
+| Alias | Descricao | Campos usados |
+|-------|-----------|---------------|
+| SA1 | Clientes | A1_COD, A1_NOME, A1_CGC |
+
+### Gravacao
+| Alias | Descricao | Campos gravados |
+|-------|-----------|-----------------|
+| SC5 | Pedidos de venda | C5_NUM, C5_EMISSAO, C5_VALOR |
+
+## Parametros MV_*
+| Parametro | Descricao | Impacto |
+|-----------|-----------|---------|
+| MV_ESTADO | UF padrao | Define UF quando nao informada |
+
+## Pontos de Entrada
+| Nome | Momento | O que permite |
+|------|---------|---------------|
+| MT100LOK | Apos validacao do modelo | Validacao customizada |
+
+## Fluxo de Execucao
+1. Valida parametros de entrada
+2. Posiciona na tabela SA1
+3. Calcula valores
+4. Grava na SC5
+5. Retorna resultado
+
+## Dependencias
+| Funcao | Arquivo | Tipo |
+|--------|---------|------|
+| fCalcImposto | MATA461.prw | Static Function |
+
+## Historico de Alteracoes
+| Data | Autor | Descricao |
+|------|-------|-----------|
+| 01/01/2026 | Thalys Augusto | Criacao |
+```
+
+### Tipo: api -- Documentacao de API REST
+
+```markdown
+# API: NomeDoEndpoint
+
+## Endpoint
+`METHOD /api/v1/recurso`
+
+## Autenticacao
+Bearer Token (Authorization header)
+
+## Parametros
+
+### Path Parameters
+| Nome | Tipo | Obrigatorio | Descricao |
+|------|------|-------------|-----------|
+
+### Query Parameters
+| Nome | Tipo | Obrigatorio | Descricao |
+|------|------|-------------|-----------|
+
+### Request Body
+{
+    "campo1": "string",
+    "campo2": 0
+}
+
+## Response
+
+### 200 OK
+{
+    "success": true,
+    "data": {}
+}
+
+### 400 Bad Request
+{
+    "success": false,
+    "error": "descricao do erro"
+}
+```
+
+## Processo
+
+1. Ler o arquivo alvo completamente
+2. Identificar todas as funcoes/metodos e suas assinaturas
+3. Analisar tipos de variaveis a partir de declaracoes e uso
+4. Detectar tabelas acessadas (DBSelectArea, RecLock, BeginSQL, %table:%)
+5. Detectar parametros MV_* (GetMV, SuperGetMV)
+6. Detectar pontos de entrada (se o codigo E um ponto de entrada, ou os chama)
+7. Mapear dependencias de chamadas de funcao (Grep para nomes de funcao)
+8. Verificar git log para historico se disponivel
+9. Gerar documentacao seguindo o template do tipo solicitado

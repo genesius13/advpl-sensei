@@ -1,0 +1,18 @@
+{
+  "title": "Skills",
+  "pages": [
+    "advpl-code-generation",
+    "advpl-code-review",
+    "advpl-debugging",
+    "advpl-refactoring",
+    "advpl-to-tlpp-migration",
+    "changelog-patterns",
+    "code-explanation",
+    "documentation-patterns",
+    "embedded-sql",
+    "probat-testing",
+    "protheus-business",
+    "protheus-reference",
+    "sx-configuration"
+  ]
+}

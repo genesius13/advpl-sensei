@@ -1,0 +1,74 @@
+---
+title: Protheus Reference
+description: Guia de referencia para funcoes nativas, dicionario de dados SX, endpoints REST e parametros MV do TOTVS Protheus
+---
+
+# Protheus Reference
+
+Guia de referencia para o ecossistema TOTVS Protheus. Fornece acesso rapido a funcoes nativas, dicionario de dados (tabelas SX), endpoints de API REST e parametros de sistema (MV_*).
+
+## Quando Usar
+
+- Consultar sintaxe, parametros ou retorno de funcoes nativas
+- Entender a estrutura do dicionario de dados SX (SX1 a SX9, SIX)
+- Encontrar endpoints de API REST para integracao com Protheus
+- Verificar proposito e valores padrao de parametros MV_*
+- Entender arquivos de configuracao .ini (appserver.ini, smartclient.ini)
+
+## Estrategia de Consulta
+
+1. **Local primeiro:** Verificar arquivos de suporte (native-functions.md, sx-dictionary.md, rest-api-reference.md)
+2. **Fallback online:** Pesquisar TDN com `WebSearch` usando query: `site:tdn.totvs.com <nome_funcao>`
+3. **WebFetch da pagina TDN:** Se URL encontrada, usar `WebFetch` para extrair detalhes
+4. **Fallback Playwright:** Se `WebSearch` ou `WebFetch` falhar, usar Playwright MCP para navegar e capturar informacoes do TDN
+
+## Categorias de Funcoes
+
+| Categoria | Funcoes Comuns | Referencia |
+|-----------|---------------|------------|
+| String | Alltrim, SubStr, StrTran, Pad*, Upper, Lower | native-functions.md |
+| Data/Hora | dDataBase, DtoS, StoD, Day, Month, Year | native-functions.md |
+| Array | aAdd, aDel, aSize, aScan, aSort, aClone | native-functions.md |
+| Banco de Dados | DbSelectArea, DbSetOrder, DbSeek, RecLock, MsUnlock | native-functions.md |
+| Interface | MsgInfo, MsgYesNo, MsgAlert, FWExecView, Enchoice | native-functions.md |
+| Arquivo I/O | FOpen, FRead, FWrite, FClose, FErase, Directory | native-functions.md |
+| Rede | HttpGet, HttpPost, FWRest, WsRestFul | native-functions.md |
+| SOAP | TWsdlManager (ParseURL, SetOperation, SendSoapMsg, GetParsedResponse) | native-functions.md |
+| Sistema | GetMV, PutMV, SuperGetMV, Conout, FWLogMsg | native-functions.md |
+
+## Referencia Rapida do Dicionario de Dados
+
+| Tabela | Proposito |
+|--------|-----------|
+| SX1 | Perguntas (parametros para relatorios/rotinas) |
+| SX2 | Tabelas (definicoes de tabela) |
+| SX3 | Campos (definicoes de campo) |
+| SX5 | Tabelas genericas (tabelas de lookup generico) |
+| SX6 | Parametros (parametros de sistema MV_*) |
+| SX7 | Gatilhos (triggers de campo) |
+| SX9 | Relacionamentos (relacionamentos entre tabelas) |
+| SXB | Consultas padrao (standard queries) |
+| SIX | Indices (definicoes de indice) |
+
+## Padroes de API REST
+
+Protheus REST APIs seguem dois padroes principais:
+
+1. **FWRest Framework** (mais novo): Baseado em anotacoes com `@Get`, `@Post`, `@Put`, `@Delete`
+2. **WsRestFul** (legado): Baseado em classe com `wsmethod`
+
+## Dicas de Pesquisa Online
+
+Ao pesquisar no TDN (TOTVS Developer Network):
+- Usar `WebSearch` com query: `site:tdn.totvs.com <nome_funcao> advpl`
+- Para docs de API: `site:tdn.totvs.com rest api <nome_endpoint>`
+- Para release notes: `site:tdn.totvs.com <feature> release notes`
+- URL base do TDN: `https://tdn.totvs.com`
+
+## Arquivos de Suporte
+
+Esta skill inclui os seguintes arquivos de referencia detalhados:
+
+- **native-functions.md** - Referencia de funcoes nativas do Protheus com sintaxe, parametros e exemplos
+- **rest-api-reference.md** - Padroes de endpoints REST e autenticacao
+- **sx-dictionary.md** - Estrutura completa do dicionario de dados com descricoes de campo
