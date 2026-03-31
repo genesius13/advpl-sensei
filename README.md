@@ -28,48 +28,44 @@ Servidor **Model Context Protocol (MCP)** especializado no ecossistema **TOTVS P
 - **Debugger**: Mestre em encontrar problemas complexos em logs do AppServer.
 - **Process Consultant**: Consultor funcional para os principais módulos ERP.
 
-## 📦 Instalação no VS Code
+## 📦 Instalação em Qualquer Máquina (NPM/NPX)
 
-### 1. Requisitos
-- Node.js v18 ou superior instalado.
-- Uma extensão compatível com MCP (**GitHub Copilot**, **Cline** ou **Roo Code**).
+Para usar o **Advpl Sensei** no VS Code de qualquer máquina, você não precisa clonar este repositório. Basta configurar seu cliente MCP (GitHub Copilot, Cline ou Roo Code) com:
 
-### 2. Configuração (Local)
-Clone este repositório e compile o projeto:
-```bash
-git clone https://github.com/thalysjuvenal/advpl-specialist.git
-cd advpl-specialist/mcp-server
-npm install
-npm run build
-```
+### Configuração (Caminho Único)
+Adicione esta configuração ao seu cliente MCP:
 
-### 3. Adicionar ao VS Code
-
-#### No GitHub Copilot
-Adicione ao seu arquivo `.vscode/mcp.json`:
 ```json
 {
   "mcpServers": {
-    "advpl-specialist": {
-      "command": "node",
-      "args": ["/Caminho/Para/advpl-specialist/mcp-server/dist/index.js"]
+    "advpl-sensei": {
+      "command": "npx",
+      "args": ["-y", "@netoalmanca/advpl-sensei"]
     }
   }
 }
 ```
 
-#### No Cline / Roo Code
-Nas configurações de **MCP Servers**, adicione:
-```json
-{
-  "mcpServers": {
-    "advpl-specialist": {
-      "command": "node",
-      "args": ["/Caminho/Para/advpl-specialist/mcp-server/dist/index.js"]
-    }
-  }
-}
-```
+### Por que usar via NPX?
+- **Sempre Atualizado**: O `npx` sempre busca a versão mais recente do Sensei.
+- **Sem Dependências**: Não precisa baixar o código manualmente ou rodar `npm install`.
+- **Fácil**: Funciona instantaneamente no Windows, Linux ou Mac (apenas requer o Node.js instalado).
+
+## 💡 Exemplos de Uso
+
+Agora que o **Advpl Sensei** está configurado no seu VS Code, você pode usá-lo com comandos simples no chat:
+
+### Gerar Código
+> "Crie uma User Function de faturamento para realizar o cálculo de impostos customizado, seguindo as melhores práticas do Sensei."
+
+### Revisão de Código
+> "Revise este arquivo `.prw` aberto e verifique se estou usando funções restritas da TOTVS ou se há problemas de performance."
+
+### Dicionário e Referência
+> "Consulte os recursos do Sensei e me diga quais são os campos da tabela SX3 e como configurar um gatilho na SX7."
+
+### Migração ADVPL -> TLPP
+> "Migre este código procedural ADVPL para uma classe TLPP organizada, usando namespaces e tipos de dados modernos."
 
 ## 🛠 Desenvolvimento
 

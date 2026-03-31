@@ -1,5 +1,5 @@
 {
-  "name": "@advpl-sensei/mcp-server",
+  "name": "@netoalmanca/advpl-sensei",
   "version": "1.1.0",
   "description": "MCP Server for ADVPL/TLPP Protheus ecosystem",
   "main": "dist/index.js",
