@@ -1,19 +1,26 @@
 ---
 description: Refactor ADVPL/TLPP code - extract functions, simplify logic, remove dead code, improve naming
 allowed-tools: Read, Write, Edit, Glob, Grep, Bash, Agent, Skill, WebSearch, WebFetch
-argument-hint: "<file> [--dry-run]"
+parameters:
+  target:
+    type: string
+    description: "Caminho do arquivo ou diretório para refatorar"
+  dryRun:
+    type: boolean
+    description: "Mostrar sugestões sem aplicar as alterações"
+    required: false
 ---
 
 **IMPORTANT:** Always respond in the same language the user is writing in. If the user writes in Portuguese, respond in Portuguese. If in English, respond in English.
 
-# /advpl-specialist:refactor
+# /advpl-sensei:refactor
 
 Analyze and refactor ADVPL/TLPP code to improve structure without changing behavior.
 
 ## Usage
 
 ```bash
-/advpl-specialist:refactor <target> [options]
+/advpl-sensei:refactor <target> [options]
 ```
 
 ## Options
@@ -49,13 +56,13 @@ Analyze and refactor ADVPL/TLPP code to improve structure without changing behav
 
 ```bash
 # Refactor a source file (interactive, with approval)
-/advpl-specialist:refactor src/FATA001.prw
+/advpl-sensei:refactor src/FATA001.prw
 
 # Show suggestions without applying
-/advpl-specialist:refactor src/FATA001.prw --dry-run
+/advpl-sensei:refactor src/FATA001.prw --dry-run
 
 # Refactor all files in a directory
-/advpl-specialist:refactor src/
+/advpl-sensei:refactor src/
 ```
 
 ## Output

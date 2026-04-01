@@ -1,10 +1,28 @@
 ---
 description: Generate ADVPL/TLPP code - functions, classes, MVC structures, REST APIs, Web Services, and entry points for TOTVS Protheus
-allowed-tools: Read, Write, Edit, Glob, Grep, Bash, Agent, Skill, WebSearch, WebFetch
-argument-hint: "<type> [name] [--module module]"
+parameters:
+  type:
+    type: string
+    enum: ["function", "class", "mvc", "rest", "ponto-entrada", "webservice", "treport", "fwformbrowse", "job", "workflow"]
+    description: "Tipo de código a ser gerado"
+  name:
+    type: string
+    description: "Nome da rotina ou classe"
+  module:
+    type: string
+    description: "Módulo do Protheus (FAT, COM, FIN, etc.)"
+    required: false
+  lang:
+    type: string
+    enum: ["advpl", "tlpp"]
+    description: "Linguagem desejada"
+    required: false
+  prompt:
+    type: string
+    description: "Instruções específicas sobre a lógica de negócio"
 ---
 
-# /advpl-specialist:generate
+# /advpl-sensei:generate
 
 **IMPORTANT:** Always respond in the same language the user is writing in. If the user writes in Portuguese, respond in Portuguese. If in English, respond in English. Adapt all explanations and suggestions to the user's language. Code comments may remain in English or match the user's language.
 
@@ -13,7 +31,7 @@ Generate new ADVPL or TLPP code following Protheus conventions and best practice
 ## Usage
 
 ```bash
-/advpl-specialist:generate <type> [name] [--module <module>]
+/advpl-sensei:generate <type> [name] [--module <module>]
 ```
 
 ## Types
@@ -71,34 +89,34 @@ Generate new ADVPL or TLPP code following Protheus conventions and best practice
 
 ```bash
 # Create a User Function for billing module
-/advpl-specialist:generate function FATA050 --module FAT
+/advpl-sensei:generate function FATA050 --module FAT
 
 # Create a TLPP service class
-/advpl-specialist:generate class PedidoService
+/advpl-sensei:generate class PedidoService
 
 # Create complete MVC CRUD
-/advpl-specialist:generate mvc CadProduto --module EST
+/advpl-sensei:generate mvc CadProduto --module EST
 
 # Create a REST API endpoint
-/advpl-specialist:generate rest ClienteAPI --lang tlpp
+/advpl-sensei:generate rest ClienteAPI --lang tlpp
 
 # Create an entry point
-/advpl-specialist:generate ponto-entrada MT100LOK
+/advpl-sensei:generate ponto-entrada MT100LOK
 
 # Create a SOAP Web Service
-/advpl-specialist:generate webservice WSPedido
+/advpl-sensei:generate webservice WSPedido
 
 # Create a TReport report
-/advpl-specialist:generate treport RelProdutos --module EST
+/advpl-sensei:generate treport RelProdutos --module EST
 
 # Create a FWFormBrowse screen
-/advpl-specialist:generate fwformbrowse CadFornecedores --module COM
+/advpl-sensei:generate fwformbrowse CadFornecedores --module COM
 
 # Create a batch processing job
-/advpl-specialist:generate job JobProcessaNotas --module FAT
+/advpl-sensei:generate job JobProcessaNotas --module FAT
 
 # Create an approval workflow
-/advpl-specialist:generate workflow AprovacaoPedido --module COM
+/advpl-sensei:generate workflow AprovacaoPedido --module COM
 ```
 
 ## Output

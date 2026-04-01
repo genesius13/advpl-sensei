@@ -1,7 +1,7 @@
 # Plano de Implementação: Servidor MCP para ADVPL/TLPP (Protheus)
 
 ## Objetivo
-Transformar a inteligência do projeto `advpl-agent` em um servidor **Model Context Protocol (MCP)** para o VS Code, permitindo que IAs (Cline, Roo Code, etc.) utilizem as ferramentas, conhecimentos e personas especializadas em Protheus.
+Transformar a inteligência do projeto `advpl-sensei` em um servidor **Model Context Protocol (MCP)** para o VS Code, permitindo que IAs (Cline, Roo Code, etc.) utilizem as ferramentas, conhecimentos e personas especializadas em Protheus.
 
 ## Arquitetura Proposta
 
@@ -54,7 +54,7 @@ Converter os arquivos em `/agents` em prompts pré-configurados:
 
 ## Estrutura de Pastas Final
 ```text
-advpl-agent/
+advpl-sensei/
 ├── agents/             # Mantido (fonte de verdade para Prompts)
 ├── commands/           # Mantido (fonte de verdade para Tools)
 ├── skills/             # Mantido (fonte de verdade para Resources)

@@ -1,19 +1,27 @@
 ---
 description: Explain ADVPL/TLPP code in plain language for developers and functional consultants
 allowed-tools: Read, Glob, Grep, Bash, Agent, Skill
-argument-hint: "<file|code> [--level junior|senior|funcional]"
+parameters:
+  target:
+    type: string
+    description: "Caminho do arquivo ou snippet de código para explicar"
+  level:
+    type: string
+    enum: ["junior", "senior", "funcional"]
+    description: "Nível da audiência: iniciante, experiente ou consultor funcional"
+    required: false
 ---
 
 **IMPORTANT:** Always respond in the same language the user is writing in. If the user writes in Portuguese, respond in Portuguese. If in English, respond in English.
 
-# /advpl-specialist:explain
+# /advpl-sensei:explain
 
 Explain ADVPL/TLPP code in plain language, adapted to the audience level.
 
 ## Usage
 
 ```bash
-/advpl-specialist:explain <target> [--level level]
+/advpl-sensei:explain <target> [--level level]
 ```
 
 ## Levels
@@ -40,16 +48,16 @@ If `--level` is not provided, default to `junior`.
 
 ```bash
 # Explain code for a junior developer (default)
-/advpl-specialist:explain src/MATA461.prw
+/advpl-sensei:explain src/MATA461.prw
 
 # Explain for a functional consultant
-/advpl-specialist:explain src/CustomFaturamento.prw --level funcional
+/advpl-sensei:explain src/CustomFaturamento.prw --level funcional
 
 # Explain for a senior developer
-/advpl-specialist:explain src/JobProcessaNF.tlpp --level senior
+/advpl-sensei:explain src/JobProcessaNF.tlpp --level senior
 
 # Explain a specific function
-/advpl-specialist:explain src/Utils.prw::fCalcDesconto
+/advpl-sensei:explain src/Utils.prw::fCalcDesconto
 ```
 
 ## Output

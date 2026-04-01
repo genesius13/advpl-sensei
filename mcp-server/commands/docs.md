@@ -1,10 +1,23 @@
 ---
 description: Look up Protheus documentation - native functions, SX data dictionary, REST APIs, MV parameters, and framework reference
 allowed-tools: Read, Glob, Grep, Bash, Agent, Skill, WebSearch, WebFetch
-argument-hint: "<term> [--source tdn|local] [--type function|sx|api|param]"
+parameters:
+  term:
+    type: string
+    description: "Termo de busca (função, tabela SX, parâmetro MV, API)"
+  source:
+    type: string
+    enum: ["local", "tdn", "both"]
+    description: "Fonte de busca: local, TDN (online) ou ambos"
+    required: false
+  type:
+    type: string
+    enum: ["function", "sx", "api", "param"]
+    description: "Filtrar por tipo: função, dicionário SX, API ou parâmetro MV"
+    required: false
 ---
 
-# /advpl-specialist:docs
+# /advpl-sensei:docs
 
 **IMPORTANT:** Always respond in the same language the user is writing in. If the user writes in Portuguese, respond in Portuguese. If in English, respond in English. Adapt all explanations and suggestions to the user's language.
 
@@ -13,7 +26,7 @@ Look up documentation for Protheus functions, APIs, tables, and parameters.
 ## Usage
 
 ```bash
-/advpl-specialist:docs <term> [options]
+/advpl-sensei:docs <term> [options]
 ```
 
 ## Options
@@ -39,19 +52,19 @@ Look up documentation for Protheus functions, APIs, tables, and parameters.
 
 ```bash
 # Look up a function
-/advpl-specialist:docs FWExecView
+/advpl-sensei:docs FWExecView
 
 # Look up a data dictionary table
-/advpl-specialist:docs SX2 --type sx
+/advpl-sensei:docs SX2 --type sx
 
 # Look up a system parameter
-/advpl-specialist:docs MV_ESTADO --type param
+/advpl-sensei:docs MV_ESTADO --type param
 
 # Force TDN search
-/advpl-specialist:docs MsExecAuto --source tdn
+/advpl-sensei:docs MsExecAuto --source tdn
 
 # Look up REST API pattern
-/advpl-specialist:docs FWRest --type api
+/advpl-sensei:docs FWRest --type api
 ```
 
 ## Output

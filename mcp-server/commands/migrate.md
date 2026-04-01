@@ -1,10 +1,33 @@
 ---
 description: Migrate ADVPL procedural code to TLPP object-oriented code with classes, namespaces, and modern patterns
 allowed-tools: Read, Write, Edit, Glob, Grep, Bash, Agent, Skill, WebSearch, WebFetch
-argument-hint: "<file.prw> [--output file.tlpp] [--dry-run]"
+parameters:
+  target:
+    type: string
+    description: "Caminho do arquivo .prw para migrar para TLPP"
+  output:
+    type: string
+    description: "Caminho do arquivo .tlpp de saída"
+    required: false
+  dryRun:
+    type: boolean
+    description: "Mostrar plano de migração sem gerar arquivos"
+    required: false
+  keepOriginal:
+    type: boolean
+    description: "Manter o arquivo .prw original"
+    required: false
+  wrapper:
+    type: boolean
+    description: "Gerar wrapper de compatibilidade para chamadas antigas"
+    required: false
+  namespace:
+    type: string
+    description: "Namespace para a nova classe TLPP"
+    required: false
 ---
 
-# /advpl-specialist:migrate
+# /advpl-sensei:migrate
 
 **IMPORTANT:** Always respond in the same language the user is writing in. If the user writes in Portuguese, respond in Portuguese. If in English, respond in English. Adapt all explanations and suggestions to the user's language. Code comments may remain in English or match the user's language.
 
@@ -13,7 +36,7 @@ Convert ADVPL procedural code to TLPP with object-oriented patterns.
 ## Usage
 
 ```bash
-/advpl-specialist:migrate <file.prw> [options]
+/advpl-sensei:migrate <file.prw> [options]
 ```
 
 ## Options
@@ -62,16 +85,16 @@ Convert ADVPL procedural code to TLPP with object-oriented patterns.
 
 ```bash
 # Migrate a file (shows plan first, then generates)
-/advpl-specialist:migrate src/FATA001.prw
+/advpl-sensei:migrate src/FATA001.prw
 
 # Preview migration without generating files
-/advpl-specialist:migrate src/FATA001.prw --dry-run
+/advpl-sensei:migrate src/FATA001.prw --dry-run
 
 # Specify output path and namespace
-/advpl-specialist:migrate src/FATA001.prw --output src/tlpp/PedidoService.tlpp --namespace mycompany.faturamento
+/advpl-sensei:migrate src/FATA001.prw --output src/tlpp/PedidoService.tlpp --namespace mycompany.faturamento
 
 # Migrate without backward compatibility wrapper
-/advpl-specialist:migrate src/FATA001.prw --wrapper false
+/advpl-sensei:migrate src/FATA001.prw --wrapper false
 ```
 
 ## Output

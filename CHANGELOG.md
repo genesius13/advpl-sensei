@@ -2,16 +2,16 @@
 
 All notable changes to this project will be documented in this file.
 
-## [1.1.0] - 2026-03-31
-
-### Changed
-- **Renaming**: Project officially renamed to **Advpl Sensei**.
-- **Strategic Pivot**: Transitioned the project from a Claude Code plugin to a dedicated **MCP Server (Model Context Protocol)**. This change enables the ADVPL/TLPP intelligence to be used across multiple VS Code extensions like Cline, Roo Code, and Continue.
-- Updated project roadmap to prioritize MCP Tool and Resource implementation.
+## [1.1.0] - 2026-04-01
 
 ### Added
-- New implementation plan for MCP migration: `plans/mcp-migration-plan.md`.
-- Initial structure for the MCP Server in the `mcp-server/` directory.
+- **Core MCP Server Implementation**: Refined `mcp-server/src/index.ts` to improve the `CallToolRequestSchema` handler, making it more informative about tool arguments and error handling during simulation.
+- **Structured Command Definitions**: All command `.md` files in `mcp-server/commands/` now include structured `parameters` in their frontmatter, defining clear input schemas for each tool.
+
+### Changed
+- **Project Renamed**: The project is now officially named **Advpl Sensei**.
+- **MCP Server Transition**: Shifted focus to implementing a **Model Context Protocol (MCP) Server** in `mcp-server/`, enabling broader integration with VS Code extensions (Cline, Roo Code, Continue).
+- **Updated Tool Documentation**: Command definition files (`.md`) now feature detailed `parameters` in their frontmatter, improving schema definition for the MCP server.
 
 ## [1.0.7] - 2026-03-30
 ### Added

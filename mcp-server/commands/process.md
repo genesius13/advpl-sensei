@@ -1,11 +1,18 @@
 ---
 description: Consult Protheus ERP business processes, module workflows, routines and integrations
 allowed-tools: Read, Glob, Grep, WebSearch, WebFetch, Skill, Bash, EnterPlanMode, ExitPlanMode, browser_navigate, browser_snapshot, browser_take_screenshot, browser_fill_form, browser_click, browser_close
-argument-hint: "<process|routine|module> [--type process|routine|module|integration]"
-agent: process-consultant
+parameters:
+  query:
+    type: string
+    description: "Consulta sobre processo, rotina, módulo ou integração (ex: MATA410, fluxo de compras)"
+  type:
+    type: string
+    enum: ["process", "routine", "module", "integration"]
+    description: "Tipo de consulta: processo, rotina, módulo ou integração"
+    required: false
 ---
 
-# /advpl-specialist:process
+# /advpl-sensei:process
 
 **IMPORTANT:** Always respond in the same language the user is writing in. If the user writes in Portuguese, respond in Portuguese. If in English, respond in English. Adapt all explanations, process descriptions, and references to the user's language.
 
@@ -14,7 +21,7 @@ Consult Protheus ERP business processes, module workflows, routines, and integra
 ## Usage
 
 ```bash
-/advpl-specialist:process <query> [options]
+/advpl-sensei:process <query> [options]
 ```
 
 ## Options
@@ -85,22 +92,22 @@ When the user needs more detail, load additional skills:
 
 ```bash
 # Understand a business process
-/advpl-specialist:process fluxo de compras
+/advpl-sensei:process fluxo de compras
 
 # Look up a specific routine
-/advpl-specialist:process MATA410
+/advpl-sensei:process MATA410
 
 # Understand a module
-/advpl-specialist:process modulo Faturamento --type module
+/advpl-sensei:process modulo Faturamento --type module
 
 # Understand integration between modules
-/advpl-specialist:process integracao Compras Estoque --type integration
+/advpl-sensei:process integracao Compras Estoque --type integration
 
 # Ask in natural language
-/advpl-specialist:process como funciona o processo de faturamento no Protheus?
+/advpl-sensei:process como funciona o processo de faturamento no Protheus?
 
 # Look up financial process
-/advpl-specialist:process contas a pagar
+/advpl-sensei:process contas a pagar
 ```
 
 ## Output

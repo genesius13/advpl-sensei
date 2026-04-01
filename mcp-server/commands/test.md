@@ -1,10 +1,30 @@
 ---
 description: Generate ProBat unit tests for TLPP classes and functions
 allowed-tools: Read, Write, Edit, Glob, Grep, Bash, Agent, Skill, WebSearch, WebFetch
-argument-hint: "<file.tlpp|function> [--type unit|api] [--output path]"
+parameters:
+  target:
+    type: string
+    description: "Caminho do arquivo .tlpp ou nome da função/classe para testar"
+  type:
+    type: string
+    enum: ["unit", "api"]
+    description: "Tipo de teste: unitário ou API REST"
+    required: false
+  output:
+    type: string
+    description: "Caminho do arquivo de teste de saída"
+    required: false
+  suite:
+    type: string
+    description: "Nome da suíte para agrupamento de testes"
+    required: false
+  owner:
+    type: string
+    description: "Identificador do autor/time para o @TestFixture"
+    required: false
 ---
 
-# /advpl-specialist:test
+# /advpl-sensei:test
 
 **IMPORTANT:** Always respond in the same language the user is writing in. If the user writes in Portuguese, respond in Portuguese. If in English, respond in English. Adapt all explanations and suggestions to the user's language. Code comments may remain in English or match the user's language.
 
@@ -13,7 +33,7 @@ Generate ProBat unit tests for TLPP classes and functions on TOTVS Protheus.
 ## Usage
 
 ```bash
-/advpl-specialist:test <target> [options]
+/advpl-sensei:test <target> [options]
 ```
 
 Where `<target>` is a `.tlpp` file path or a function/class name.
@@ -39,7 +59,7 @@ Where `<target>` is a `.tlpp` file path or a function/class name.
 ProBat only works with TLPP (`.tlpp` files). If a `.prw` file is passed:
 
 1. Inform the user that ProBat requires TLPP
-2. Suggest using `/advpl-specialist:migrate` first to convert the source to TLPP
+2. Suggest using `/advpl-sensei:migrate` first to convert the source to TLPP
 3. The test file itself is always `.tlpp`, even when testing ADVPL functions
 
 ## Process
@@ -74,19 +94,19 @@ ProBat only works with TLPP (`.tlpp` files). If a `.prw` file is passed:
 
 ```bash
 # Generate unit tests for a TLPP file
-/advpl-specialist:test src/calculadora.tlpp
+/advpl-sensei:test src/calculadora.tlpp
 
 # Generate API tests for a REST endpoint
-/advpl-specialist:test src/customer_api.tlpp --type api
+/advpl-sensei:test src/customer_api.tlpp --type api
 
 # Generate tests with a specific output path
-/advpl-specialist:test src/pedido_service.tlpp --output test/unit/test_pedido.tlpp
+/advpl-sensei:test src/pedido_service.tlpp --output test/unit/test_pedido.tlpp
 
 # Generate tests for a specific function
-/advpl-specialist:test U_calculateTotal --type unit
+/advpl-sensei:test U_calculateTotal --type unit
 
 # Generate tests grouped in a suite
-/advpl-specialist:test src/financeiro/ --suite financeiro
+/advpl-sensei:test src/financeiro/ --suite financeiro
 ```
 
 ## Output

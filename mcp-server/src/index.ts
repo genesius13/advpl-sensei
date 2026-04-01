@@ -12,11 +12,38 @@ import {
 import { promises as fs } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import yaml from "js-yaml";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 // Estrutura: dist/index.js -> mcp-server/
 const MCP_ROOT = path.resolve(__dirname, "..");
+
+/**
+ * Interface para representar o frontmatter dos arquivos .md
+ */
+interface MarkdownMetadata {
+  name?: string;
+  description?: string;
+  parameters?: Record<string, any>;
+  arguments?: Array<{ name: string; description?: string; required?: boolean }>;
+}
+
+/**
+ * Extrai o frontmatter YAML de um arquivo markdown
+ */
+function parseFrontmatter(content: string): { metadata: MarkdownMetadata; body: string } {
+  const match = content.match(/^---\r?\n([\s\S]*?)\r?\n---\r?\n([\s\S]*)$/);
+  if (match) {
+    try {
+      const metadata = yaml.load(match[1]) as MarkdownMetadata;
+      return { metadata, body: match[2] };
+    } catch (e) {
+      console.error("Erro ao processar frontmatter:", e);
+    }
+  }
+  return { metadata: {}, body: content };
+}
 
 const server = new Server(
   {
@@ -47,10 +74,14 @@ server.setRequestHandler(ListResourcesRequestSchema, async () => {
         if (entry.isDirectory()) {
           await walk(fullPath);
         } else if (entry.name.endsWith(".md")) {
+          const content = await fs.readFile(fullPath, "utf-8");
+          const { metadata } = parseFrontmatter(content);
           const relPath = path.relative(skillsDir, fullPath);
+          
           resources.push({
             uri: `mcp://advpl/skills/${relPath}`,
-            name: relPath,
+            name: metadata.name || relPath,
+            description: metadata.description || `Skill: ${relPath}`,
             mimeType: "text/markdown",
           });
         }
@@ -84,17 +115,18 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
       if (file.endsWith(".md")) {
         const name = file.replace(".md", "");
         const content = await fs.readFile(path.join(commandsDir, file), "utf-8");
-        const descMatch = content.match(/description: (.*)/);
+        const { metadata } = parseFrontmatter(content);
+        
         tools.push({
           name: `advpl_${name}`,
-          description: descMatch ? descMatch[1] : `Command ${name}`,
+          description: metadata.description || `Command ${name}`,
           inputSchema: {
             type: "object",
-            properties: {
-              prompt: { type: "string" },
-              args: { type: "string" },
+            properties: metadata.parameters || {
+              prompt: { type: "string", description: "O prompt ou instrução para o comando" },
+              args: { type: "string", description: "Argumentos adicionais (opcional)" },
             },
-            required: ["prompt"],
+            required: metadata.parameters ? Object.keys(metadata.parameters).filter(k => metadata.parameters![k].required !== false) : ["prompt"],
           },
         });
       }
@@ -104,14 +136,78 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
 });
 
 server.setRequestHandler(CallToolRequestSchema, async (request) => {
-  const name = request.params.name.replace("advpl_", "");
-  const filePath = path.join(MCP_ROOT, "commands", `${name}.md`);
-  const instructions = await fs.readFile(filePath, "utf-8");
-  const { prompt, args } = request.params.arguments as any;
+  const toolName = request.params.name; // e.g., 'advpl_generate'
+  const mcpToolName = toolName.replace("advpl_", ""); // e.g., 'generate'
+  const commandFilePath = path.join(MCP_ROOT, "commands", `${mcpToolName}.md`);
+  
+  let metadata: MarkdownMetadata = {};
+  let commandBody: string = "";
+
+  try {
+    const content = await fs.readFile(commandFilePath, "utf-8");
+    const parsed = parseFrontmatter(content);
+    metadata = parsed.metadata;
+    commandBody = parsed.body;
+  } catch (error) {
+    console.error(`Erro ao carregar definição da ferramenta '${toolName}':`, error);
+    const errMsg = (error && typeof error === 'object' && 'message' in error) ? (error as any).message : String(error);
+    return {
+      content: [{
+        type: "text",
+        text: `Erro ao carregar definição da ferramenta '${toolName}'. Verifique se o arquivo de comando existe e está formatado corretamente. Detalhe: ${errMsg}`,
+      }],
+    };
+  }
+
+  const toolDescription = metadata.description || `Ferramenta '${toolName}' sem descrição.`;
+  const toolParametersSchema = metadata.parameters || {};
+  const receivedArguments = request.params.arguments || {};
+
+  // Constrói uma resposta mais descritiva
+  let responseText = `Chamada da Ferramenta: \`${toolName}\`\n`;
+  responseText += `Descrição: ${toolDescription}\n\n`;
+  responseText += `Argumentos Recebidos:\n`;
+
+  // Determina quais parâmetros são obrigatórios com base no schema
+  const allParameterNames = Object.keys(toolParametersSchema);
+  const requiredParams = allParameterNames.filter(paramName => toolParametersSchema[paramName].required !== false);
+  const optionalParams = allParameterNames.filter(paramName => toolParametersSchema[paramName].required === false);
+
+  // Lista argumentos obrigatórios
+  if (requiredParams.length > 0) {
+    responseText += `  * **Obrigatórios**:\n`;
+    requiredParams.forEach(paramName => {
+      const paramValue = receivedArguments[paramName] !== undefined ? `\`${receivedArguments[paramName]}\`` : "*(não fornecido)*";
+      responseText += `    - \`${paramName}\`: ${paramValue}\n`;
+    });
+  }
+
+  // Lista argumentos opcionais
+  if (optionalParams.length > 0) {
+    responseText += `  * **Opcionais**:\n`;
+    optionalParams.forEach(paramName => {
+      const paramValue = receivedArguments[paramName] !== undefined ? `\`${receivedArguments[paramName]}\`` : "*(não fornecido)*";
+      responseText += `    - \`${paramName}\`: ${paramValue}\n`;
+    });
+  }
+
+  // Se houver argumentos recebidos que não estão no schema de parâmetros, liste-os como desconhecidos.
+  const receivedArgNames = Object.keys(receivedArguments);
+  const unknownParams = receivedArgNames.filter(argName => !allParameterNames.includes(argName));
+  if (unknownParams.length > 0) {
+      responseText += `  * **Desconhecidos**:\n`;
+      unknownParams.forEach(paramName => {
+          responseText += `    - \`${paramName}\`: \`${receivedArguments[paramName]}\`\n`;
+      });
+  }
+
+  // Indica que esta é uma simulação/placeholder
+  responseText += `\n--- SIMULAÇÃO DE EXECUÇÃO ---\nEsta é uma resposta simulada. A lógica real de execução para '${toolName}' não está implementada neste handler.`;
+
   return {
     content: [{
       type: "text",
-      text: `Tool: ${name}\nContext: ${instructions}\nInput: ${prompt}\nArgs: ${args || ""}`,
+      text: responseText,
     }],
   };
 });
@@ -127,10 +223,13 @@ server.setRequestHandler(ListPromptsRequestSchema, async () => {
     for (const file of files) {
       if (file.endsWith(".md")) {
         const name = file.replace(".md", "");
+        const content = await fs.readFile(path.join(agentsDir, file), "utf-8");
+        const { metadata } = parseFrontmatter(content);
+        
         prompts.push({
           name: `advpl_agent_${name}`,
-          description: `Agent ${name}`,
-          arguments: [{ name: "context", required: false }],
+          description: metadata.description || `Agent Persona: ${name}`,
+          arguments: metadata.arguments || [{ name: "context", description: "Contexto adicional para o agente", required: false }],
         });
       }
     }
@@ -141,13 +240,15 @@ server.setRequestHandler(ListPromptsRequestSchema, async () => {
 server.setRequestHandler(GetPromptRequestSchema, async (request) => {
   const name = request.params.name.replace("advpl_agent_", "");
   const filePath = path.join(MCP_ROOT, "agents", `${name}.md`);
-  const text = await fs.readFile(filePath, "utf-8");
+  const content = await fs.readFile(filePath, "utf-8");
+  const { metadata, body } = parseFrontmatter(content);
+  
   return {
     messages: [{
       role: "user",
       content: {
         type: "text",
-        text: `Role: ${name}\nRules: ${text}\nContext: ${request.params.arguments?.context || ""}`,
+        text: `Role: ${name}\nDescription: ${metadata.description || ""}\nRules: ${body}\nUser Input: ${JSON.stringify(request.params.arguments)}`,
       },
     }],
   };
@@ -158,4 +259,6 @@ async function main() {
   await server.connect(transport);
 }
 
-main().catch(() => {});
+main().catch((err) => {
+  console.error("MCP Server Error:", err);
+});

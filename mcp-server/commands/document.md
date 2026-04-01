@@ -1,19 +1,31 @@
 ---
 description: Generate technical documentation from ADVPL/TLPP source code - Protheus.doc headers, routine docs, API docs
 allowed-tools: Read, Write, Edit, Glob, Grep, Bash, Agent, Skill, WebSearch, WebFetch
-argument-hint: "<file> [--type header|full|api] [--output path]"
+parameters:
+  target:
+    type: string
+    description: "Caminho do arquivo ou diretório para gerar documentação"
+  type:
+    type: string
+    enum: ["header", "full", "api"]
+    description: "Tipo de documentação: cabeçalho Protheus.doc, completo ou API"
+    required: false
+  output:
+    type: string
+    description: "Caminho do arquivo para salvar a documentação"
+    required: false
 ---
 
 **IMPORTANT:** Always respond in the same language the user is writing in. If the user writes in Portuguese, respond in Portuguese. If in English, respond in English.
 
-# /advpl-specialist:document
+# /advpl-sensei:document
 
 Generate technical documentation from existing ADVPL/TLPP source code.
 
 ## Usage
 
 ```bash
-/advpl-specialist:document <target> [options]
+/advpl-sensei:document <target> [options]
 ```
 
 ## Options
@@ -45,19 +57,19 @@ Generate technical documentation from existing ADVPL/TLPP source code.
 
 ```bash
 # Generate complete routine documentation
-/advpl-specialist:document src/MATA461.prw
+/advpl-sensei:document src/MATA461.prw
 
 # Generate just the Protheus.doc header
-/advpl-specialist:document src/MATA461.prw --type header
+/advpl-sensei:document src/MATA461.prw --type header
 
 # Document a REST API endpoint
-/advpl-specialist:document src/ApiClientes.tlpp --type api
+/advpl-sensei:document src/ApiClientes.tlpp --type api
 
 # Save documentation to a file
-/advpl-specialist:document src/MATA461.prw --output docs/MATA461.md
+/advpl-sensei:document src/MATA461.prw --output docs/MATA461.md
 
 # Document all files in a directory
-/advpl-specialist:document src/
+/advpl-sensei:document src/
 ```
 
 ## Output

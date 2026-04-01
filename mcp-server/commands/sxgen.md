@@ -1,19 +1,31 @@
 ---
 description: Generate Protheus SX data dictionary configuration scripts - SX3 fields, SIX indexes, SX1 questions, SX5 generic tables
 allowed-tools: Read, Write, Glob, Grep, Bash, Agent, Skill
-argument-hint: "[--type sx3|six|sx1|sx5] [--output path]"
+parameters:
+  description:
+    type: string
+    description: "Descrição em linguagem natural dos campos, índices ou perguntas (ex: Criar campos para ZA1...)"
+  type:
+    type: string
+    enum: ["sx3", "six", "sx1", "sx5"]
+    description: "Tipo de tabela SX: campos, índices, perguntas ou tabelas genéricas"
+    required: false
+  output:
+    type: string
+    description: "Caminho do arquivo para salvar o script gerado"
+    required: false
 ---
 
 **IMPORTANT:** Always respond in the same language the user is writing in. If the user writes in Portuguese, respond in Portuguese. If in English, respond in English.
 
-# /advpl-specialist:sxgen
+# /advpl-sensei:sxgen
 
 Generate Protheus data dictionary configuration scripts for SX tables.
 
 ## Usage
 
 ```bash
-/advpl-specialist:sxgen [options]
+/advpl-sensei:sxgen [options]
 ```
 
 Describe what you need in natural language after the command. The agent will parse your description and generate the configuration.
@@ -59,7 +71,7 @@ The command automatically:
 
 ```bash
 # Generate SX3 field definitions from description
-/advpl-specialist:sxgen --type sx3
+/advpl-sensei:sxgen --type sx3
 Criar campos para tabela ZA1 - Ordens de Servico:
 - ZA1_CODIGO: codigo da OS, char 6, obrigatorio
 - ZA1_DESCRI: descricao do servico, char 40, obrigatorio
@@ -67,25 +79,25 @@ Criar campos para tabela ZA1 - Ordens de Servico:
 - ZA1_STATUS: status, char 1, combo 1=Aberta;2=Em Andamento;3=Concluida;4=Cancelada
 
 # Generate SIX index definitions
-/advpl-specialist:sxgen --type six
+/advpl-sensei:sxgen --type six
 Indices para ZA1:
 - Indice 1: filial + codigo (unico)
 - Indice 2: filial + cliente + data abertura
 
 # Generate SX1 report questions
-/advpl-specialist:sxgen --type sx1
+/advpl-sensei:sxgen --type sx1
 Perguntas para relatorio de OS (grupo ZA1):
 - Data abertura de/ate
 - Status de/ate
 - Cliente de/ate
 
 # Generate SX5 generic table
-/advpl-specialist:sxgen --type sx5
+/advpl-sensei:sxgen --type sx5
 Tabela generica ZZ para tipos de servico:
 01=Preventiva, 02=Corretiva, 03=Instalacao
 
 # Save to file
-/advpl-specialist:sxgen --type sx3 --output config/ZA1-campos.txt
+/advpl-sensei:sxgen --type sx3 --output config/ZA1-campos.txt
 ```
 
 ## Output

@@ -5,9 +5,9 @@ Para utilizar a inteligência ADVPL/TLPP no seu VS Code, adicione a seguinte con
 ```json
 {
   "mcpServers": {
-    "advpl-agent": {
+    "advpl-sensei": {
       "command": "node",
-      "args": ["/home/neto/Projetos_Dev/advpl-agent/mcp-server/dist/index.js"],
+      "args": ["/home/neto/Projetos_Dev/advpl-sensei/mcp-server/dist/index.js"],
       "env": {}
     }
   }

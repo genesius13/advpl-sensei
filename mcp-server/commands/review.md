@@ -1,19 +1,27 @@
 ---
 description: Review ADVPL/TLPP code for best practices, performance, security, and modernization
 allowed-tools: Read, Glob, Grep, Bash, Agent, Skill, WebSearch, WebFetch
-argument-hint: "<file|directory> [--focus category]"
+parameters:
+  target:
+    type: string
+    description: "Caminho do arquivo ou diretório para revisão"
+  focus:
+    type: string
+    enum: ["boas-praticas", "performance", "seguranca", "modernizacao", "all"]
+    description: "Foco da revisão: boas práticas, performance, segurança ou modernização"
+    required: false
 ---
 
 **IMPORTANT:** Always respond in the same language the user is writing in. If the user writes in Portuguese, respond in Portuguese. If in English, respond in English. Adapt all explanations, error descriptions, and suggestions to the user's language. Code comments may remain in English or match the user's language.
 
-# /advpl-specialist:review
+# /advpl-sensei:review
 
 Review ADVPL/TLPP code for best practices, performance, security, and modernization opportunities.
 
 ## Usage
 
 ```bash
-/advpl-specialist:review <target> [--focus category]
+/advpl-sensei:review <target> [--focus category]
 ```
 
 ## Focus Categories
@@ -37,19 +45,19 @@ Review ADVPL/TLPP code for best practices, performance, security, and modernizat
 
 ```bash
 # Review a single source file (all categories)
-/advpl-specialist:review src/FATA001.prw
+/advpl-sensei:review src/FATA001.prw
 
 # Review an entire directory focusing on performance
-/advpl-specialist:review src/ --focus performance
+/advpl-sensei:review src/ --focus performance
 
 # Review REST endpoints for security issues
-/advpl-specialist:review src/REST/*.tlpp --focus seguranca
+/advpl-sensei:review src/REST/*.tlpp --focus seguranca
 
 # Review current directory for modernization opportunities
-/advpl-specialist:review . --focus modernizacao
+/advpl-sensei:review . --focus modernizacao
 
 # Review specific files for best practices
-/advpl-specialist:review src/MATA010.prw --focus boas-praticas
+/advpl-sensei:review src/MATA010.prw --focus boas-praticas
 ```
 
 ## Output

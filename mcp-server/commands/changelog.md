@@ -1,19 +1,37 @@
 ---
 description: Generate changelog from ADVPL/TLPP code changes - analyzes diffs and produces structured release notes
 allowed-tools: Read, Glob, Grep, Bash, Agent, Skill
-argument-hint: "[--since commit|date] [--format markdown|txt] [--output path]"
+parameters:
+  since:
+    type: string
+    description: "Ponto inicial para o changelog (commit hash, tag ou data YYYY-MM-DD)"
+    required: false
+  format:
+    type: string
+    enum: ["markdown", "txt"]
+    description: "Formato de saída do changelog"
+    required: false
+  output:
+    type: string
+    description: "Caminho do arquivo para salvar o changelog"
+    required: false
+  groupBy:
+    type: string
+    enum: ["file", "type", "module"]
+    description: "Agrupar entradas por arquivo, tipo ou módulo"
+    required: false
 ---
 
 **IMPORTANT:** Always respond in the same language the user is writing in. If the user writes in Portuguese, respond in Portuguese. If in English, respond in English.
 
-# /advpl-specialist:changelog
+# /advpl-sensei:changelog
 
 Generate a structured changelog from code changes in ADVPL/TLPP files.
 
 ## Usage
 
 ```bash
-/advpl-specialist:changelog [options]
+/advpl-sensei:changelog [options]
 ```
 
 ## Options
@@ -39,22 +57,22 @@ Generate a structured changelog from code changes in ADVPL/TLPP files.
 
 ```bash
 # Changelog from last commit
-/advpl-specialist:changelog
+/advpl-sensei:changelog
 
 # Changelog since a specific commit
-/advpl-specialist:changelog --since abc1234
+/advpl-sensei:changelog --since abc1234
 
 # Changelog since a date
-/advpl-specialist:changelog --since 2026-03-01
+/advpl-sensei:changelog --since 2026-03-01
 
 # Changelog in plain text format
-/advpl-specialist:changelog --since v1.0.0 --format txt
+/advpl-sensei:changelog --since v1.0.0 --format txt
 
 # Save changelog to a file
-/advpl-specialist:changelog --since v1.0.0 --output CHANGELOG.md
+/advpl-sensei:changelog --since v1.0.0 --output CHANGELOG.md
 
 # Group by module instead of type
-/advpl-specialist:changelog --since v1.0.0 --group-by module
+/advpl-sensei:changelog --since v1.0.0 --group-by module
 ```
 
 ## Output

@@ -1,10 +1,21 @@
 ---
 description: Diagnose errors and problems in ADVPL/TLPP code - compilation errors, runtime errors, performance issues, and log analysis
 allowed-tools: Read, Glob, Grep, Bash, Agent, Skill, WebSearch, WebFetch
-argument-hint: "<file|error-message> [--log logfile]"
+parameters:
+  target:
+    type: string
+    description: "Caminho do arquivo, mensagem de erro ou arquivo de log para diagnóstico"
+  log:
+    type: string
+    description: "Caminho para um arquivo de log do Protheus"
+    required: false
+  verbose:
+    type: boolean
+    description: "Se deve fornecer um diagnóstico detalhado com explicações"
+    required: false
 ---
 
-# /advpl-specialist:diagnose
+# /advpl-sensei:diagnose
 
 **IMPORTANT:** Always respond in the same language the user is writing in. If the user writes in Portuguese, respond in Portuguese. If in English, respond in English. Adapt all explanations, error descriptions, and suggestions to the user's language. Code comments may remain in English or match the user's language.
 
@@ -13,7 +24,7 @@ Diagnose and resolve ADVPL/TLPP errors and problems.
 ## Usage
 
 ```bash
-/advpl-specialist:diagnose <target> [options]
+/advpl-sensei:diagnose <target> [options]
 ```
 
 ## Modes
@@ -47,16 +58,16 @@ Diagnose and resolve ADVPL/TLPP errors and problems.
 
 ```bash
 # Analyze a source file for issues
-/advpl-specialist:diagnose src/FATA001.prw
+/advpl-sensei:diagnose src/FATA001.prw
 
 # Diagnose a specific error message
-/advpl-specialist:diagnose "THREAD ERROR ([55889]) Variable does not exist: cCodCli"
+/advpl-sensei:diagnose "THREAD ERROR ([55889]) Variable does not exist: cCodCli"
 
 # Analyze a Protheus log file
-/advpl-specialist:diagnose --log /var/protheus/console.log
+/advpl-sensei:diagnose --log /var/protheus/console.log
 
 # Verbose diagnosis with full explanations
-/advpl-specialist:diagnose src/FATA001.prw --verbose
+/advpl-sensei:diagnose src/FATA001.prw --verbose
 ```
 
 ## Output
