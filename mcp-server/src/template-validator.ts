@@ -1,12 +1,15 @@
 /**
  * Template Validator - Valida templates ADVPL/TLPP gerados
  * Fase 5 - Function Registry & Validation
+ * Fase 6 - Validação contra TDN (TOTVS oficial)
  * 
  * Integra o Function Registry com validação de boilerplates
  * para garantir que templates geram código compilável.
+ * Valida contra TDN oficial para máxima precisão.
  */
 
 import { FunctionValidator } from "./function-registry.js";
+import type { TdnFunctionValidator } from "./tdn-function-validator.js";
 
 export interface TemplateValidationIssue {
   line: number;

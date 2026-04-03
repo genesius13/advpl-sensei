@@ -452,6 +452,430 @@ export const FUNCTION_REGISTRY: FunctionRegistry = {
   },
 
   // ==========================================
+  // FUNÇÕES ADICIONAIS DE STRING
+  // ==========================================
+
+  Upper: {
+    name: "Upper",
+    type: "native",
+    language: "both",
+    category: "String",
+    description: "Converter string para maiúsculas",
+    signature: "Local cResult := Upper('texto')",
+    module: ["geral"],
+  },
+
+  Lower: {
+    name: "Lower",
+    type: "native",
+    language: "both",
+    category: "String",
+    description: "Converter string para minúsculas",
+    signature: "Local cResult := Lower('TEXTO')",
+    module: ["geral"],
+  },
+
+  StrTran: {
+    name: "StrTran",
+    type: "native",
+    language: "both",
+    category: "String",
+    description: "Substituir texto em string (Replace)",
+    signature: "Local cResult := StrTran(cText, cFind, cReplace)",
+    module: ["geral"],
+  },
+
+  // ==========================================
+  // FUNÇÕES ADICIONAIS DE TIPO/CONVERSÃO
+  // ==========================================
+
+  Val: {
+    name: "Val",
+    type: "native",
+    language: "both",
+    category: "Type",
+    description: "Converter string para número",
+    signature: "Local nResult := Val('123.45')",
+    module: ["geral"],
+  },
+
+  Str: {
+    name: "Str",
+    type: "native",
+    language: "both",
+    category: "Type",
+    description: "Converter número para string formatado",
+    signature: "Local cResult := Str(nValue, nLen, nDec)",
+    module: ["geral"],
+  },
+
+  CtoD: {
+    name: "CtoD",
+    type: "native",
+    language: "both",
+    category: "Type",
+    description: "Converter string para data (CTOD)",
+    signature: "Local dData := CtoD('31/12/2025')",
+    module: ["geral"],
+  },
+
+  DtoC: {
+    name: "DtoC",
+    type: "native",
+    language: "both",
+    category: "Type",
+    description: "Converter data para string formatada",
+    signature: "Local cData := DtoC(Date())",
+    module: ["geral"],
+  },
+
+  DtoS: {
+    name: "DtoS",
+    type: "native",
+    language: "both",
+    category: "Type",
+    description: "Converter data para string (YYYYMMDD)",
+    signature: "Local cData := DtoS(Date())",
+    module: ["geral"],
+  },
+
+  // ==========================================
+  // FUNÇÕES ADICIONAIS DE BANCO DE DADOS
+  // ==========================================
+
+  RecLock: {
+    name: "RecLock",
+    type: "native",
+    language: "advpl",
+    category: "Database",
+    description: "Bloquear registro para edição",
+    signature: "If RecLock(cAlias, .F.) [...] EndIf",
+    module: ["geral"],
+  },
+
+  MsUnLock: {
+    name: "MsUnLock",
+    type: "native",
+    language: "advpl",
+    category: "Database",
+    description: "Desbloquear e liberar registro",
+    signature: "MsUnLock(cAlias)",
+    module: ["geral"],
+  },
+
+  // ==========================================
+  // FUNÇÕES ADICIONAIS DE INTERFACE/UI
+  // ==========================================
+
+  MsgBox: {
+    name: "MsgBox",
+    type: "native",
+    language: "advpl",
+    category: "Interface",
+    description: "Caixa de mensagem com opções (OK, Cancel, etc)",
+    signature: "Local nOpc := MsgBox('Mensagem', 'Título', 'YESNO')",
+    module: ["geral"],
+  },
+
+  FWMsgBox: {
+    name: "FWMsgBox",
+    type: "framework",
+    language: "advpl",
+    category: "Interface",
+    description: "Caixa de mensagem framework TOTVS",
+    signature: "Local nOpc := FWMsgBox('Título', 'Mensagem', 'YESNO')",
+    module: ["geral"],
+  },
+
+  // ==========================================
+  // FUNÇÕES ADICIONAIS DE PARÂMETROS
+  // ==========================================
+
+  GetSX3: {
+    name: "GetSX3",
+    type: "native",
+    language: "advpl",
+    category: "Parameters",
+    description: "Obter properties de campo da tabela (SX3)",
+    signature: "Local aFields := GetSX3()",
+    module: ["geral"],
+  },
+
+  GetSX5: {
+    name: "GetSX5",
+    type: "native",
+    language: "advpl",
+    category: "Parameters",
+    description: "Obter tabela genérica SX5",
+    signature: "Local aData := GetSX5('XX')",
+    module: ["geral"],
+  },
+
+  // ==========================================
+  // FUNÇÕES ADICIONAIS DE CONTROLE/LÓGICA
+  // ==========================================
+
+  Iif: {
+    name: "Iif",
+    type: "native",
+    language: "both",
+    category: "Type",
+    description: "If Inline (ternário) - retorna valor condicionado",
+    signature: "Local xResult := Iif(lCondition, xTrueValue, xFalseValue)",
+    module: ["geral"],
+  },
+
+  Eval: {
+    name: "Eval",
+    type: "native",
+    language: "advpl",
+    category: "Type",
+    description: "Avaliar expressão como string",
+    signature: "Local xResult := Eval(cExpression)",
+    module: ["geral"],
+  },
+
+  // ==========================================
+  // FUNÇÕES FRAMEWORK ADICIONAIS
+  // ==========================================
+
+  FWArrToXml: {
+    name: "FWArrToXml",
+    type: "framework",
+    language: "advpl",
+    category: "Framework",
+    description: "Converter array para XML",
+    signature: "Local cXml := FWArrToXml(aArray)",
+    module: ["geral"],
+  },
+
+  FWXmlToArr: {
+    name: "FWXmlToArr",
+    type: "framework",
+    language: "advpl",
+    category: "Framework",
+    description: "Converter XML para array",
+    signature: "Local aArray := FWXmlToArr(cXml)",
+    module: ["geral"],
+  },
+
+  // ==========================================
+  // MAIS FUNÇÕES ÚTEIS
+  // ==========================================
+
+  Trim: {
+    name: "Trim",
+    type: "native",
+    language: "advpl",
+    category: "String",
+    description: "Remover espaços à direita de string",
+    signature: "Local cResult := Trim(cText)",
+    module: ["geral"],
+  },
+
+  LTrim: {
+    name: "LTrim",
+    type: "native",
+    language: "advpl",
+    category: "String",
+    description: "Remover espaços à esquerda de string",
+    signature: "Local cResult := LTrim(cText)",
+    module: ["geral"],
+  },
+
+  RTrim: {
+    name: "RTrim",
+    type: "native",
+    language: "advpl",
+    category: "String",
+    description: "Remover espaços à direita de string",
+    signature: "Local cResult := RTrim(cText)",
+    module: ["geral"],
+  },
+
+  PadLeft: {
+    name: "PadLeft",
+    type: "native",
+    language: "both",
+    category: "String",
+    description: "Completar string com caracteres à esquerda",
+    signature: "Local cResult := PadLeft(cText, nLen, cChar := ' ')",
+    module: ["geral"],
+  },
+
+  PadRight: {
+    name: "PadRight",
+    type: "native",
+    language: "both",
+    category: "String",
+    description: "Completar string com caracteres à direita (padrão)",
+    signature: "Local cResult := PadRight(cText, nLen, cChar := ' ')",
+    module: ["geral"],
+  },
+
+  At: {
+    name: "At",
+    type: "native",
+    language: "advpl",
+    category: "String",
+    description: "Encontrar posição de substring (case sensitive)",
+    signature: "Local nPos := At(cFind, cText)",
+    module: ["geral"],
+  },
+
+  Int: {
+    name: "Int",
+    type: "native",
+    language: "both",
+    category: "Type",
+    description: "Converter número para inteiro (trunca decimal)",
+    signature: "Local nInt := Int(123.7)",
+    module: ["geral"],
+  },
+
+  Round: {
+    name: "Round",
+    type: "native",
+    language: "both",
+    category: "Type",
+    description: "Arredondar número para decimais especificados",
+    signature: "Local nRound := Round(123.456, 2)",
+    module: ["geral"],
+  },
+
+  Abs: {
+    name: "Abs",
+    type: "native",
+    language: "both",
+    category: "Type",
+    description: "Valor absoluto (remove sinal negativo)",
+    signature: "Local nAbs := Abs(-10.5)",
+    module: ["geral"],
+  },
+
+  // ==========================================
+  // FUNÇÕES DE DATA/HORA
+  // ==========================================
+
+  Date: {
+    name: "Date",
+    type: "native",
+    language: "advpl",
+    category: "Type",
+    description: "Obter data atual do sistema",
+    signature: "Local dHoje := Date()",
+    module: ["geral"],
+  },
+
+  Time: {
+    name: "Time",
+    type: "native",
+    language: "advpl",
+    category: "Type",
+    description: "Obter hora atual em segundos desde meia-noite",
+    signature: "Local nHora := Time()",
+    module: ["geral"],
+  },
+
+  SToD: {
+    name: "SToD",
+    type: "native",
+    language: "advpl",
+    category: "Type",
+    description: "Converter string YYYYMMDD para data",
+    signature: "Local dData := SToD('20251231')",
+    module: ["geral"],
+  },
+
+  // ==========================================
+  // FUNÇÕES DE ARRAY/COLEÇÃO
+  // ==========================================
+
+  AClone: {
+    name: "AClone",
+    type: "native",
+    language: "advpl",
+    category: "Type",
+    description: "Clonar/copiar array",
+    signature: "Local aNewArray := AClone(aOldArray)",
+    module: ["geral"],
+  },
+
+  AAdd: {
+    name: "AAdd",
+    type: "native",
+    language: "advpl",
+    category: "Type",
+    description: "Adicionar elemento ao final de array",
+    signature: "Local nPos := AAdd(aArray, xValue)",
+    module: ["geral"],
+  },
+
+  ADel: {
+    name: "ADel",
+    type: "native",
+    language: "advpl",
+    category: "Type",
+    description: "Deletar elemento de array",
+    signature: "ADel(aArray, nPos)",
+    module: ["geral"],
+  },
+
+  ASize: {
+    name: "ASize",
+    type: "native",
+    language: "advpl",
+    category: "Type",
+    description: "Redimensionar array para novo tamanho",
+    signature: "ASize(aArray, nNewLen)",
+    module: ["geral"],
+  },
+
+  // ==========================================
+  // MAIS FUNÇÕES DE BANCO DE DADOS
+  // ==========================================
+
+  DbGoBottom: {
+    name: "DbGoBottom",
+    type: "native",
+    language: "advpl",
+    category: "Database",
+    description: "Posicionar no último registro",
+    signature: "DbGoBottom()",
+    module: ["geral"],
+  },
+
+  DbGoto: {
+    name: "DbGoto",
+    type: "native",
+    language: "advpl",
+    category: "Database",
+    description: "Ir para posição/registro específico",
+    signature: "DbGoto(nRecNo)",
+    module: ["geral"],
+  },
+
+  OrdSetFocus: {
+    name: "OrdSetFocus",
+    type: "native",
+    language: "advpl",
+    category: "Database",
+    description: "Definir ordem/índice ativo",
+    signature: "OrdSetFocus(nIndex)",
+    module: ["geral"],
+  },
+
+  DbCloseArea: {
+    name: "DbCloseArea",
+    type: "native",
+    language: "advpl",
+    category: "Database",
+    description: "Fechar área de trabalho/alias",
+    signature: "DbCloseArea()",
+    module: ["geral"],
+  },
+
+  // ==========================================
   // FUNÇÕES PROBLEMÁTICAS (NÃO REAIS/FICTÍCIAS)
   // ==========================================
 
@@ -463,15 +887,6 @@ export const FUNCTION_REGISTRY: FunctionRegistry = {
     description: "❌ FICTÍCIA - Não existe em ADVPL/TLPP puro",
     deprecated: true,
     module: [],
-  },
-
-  "GetErrorMessage (wrong usage)": {
-    name: "GetErrorMessage",
-    type: "native",
-    language: "advpl",
-    category: "ErrorHandling",
-    description: "⚠️ QUESTÃO: Se realmente existe em ADVPL puro",
-    module: ["geral"],
   },
 };
 

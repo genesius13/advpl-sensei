@@ -19,6 +19,10 @@
     "dev": "node --loader ts-node/esm src/index.ts",
     "test:phase5": "node --loader ts-node/esm src/__tests__/phase5-test.ts",
     "test:phase5-integration": "node --loader ts-node/esm src/__tests__/phase5-boilerplate-integration-test.ts",
+    "test:phase6": "node --loader ts-node/esm src/__tests__/phase6-tdn-validation-test.ts",
+    "test:phase8": "node --loader ts-node/esm src/__tests__/phase8-snippet-validation-test.ts",
+    "test:phase9": "node --loader ts-node/esm src/__tests__/phase9-scraper-test.ts",
+    "test:phase10": "node --loader ts-node/esm src/__tests__/phase10-mcp-validation-test.ts",
     "check:registry": "node --loader ts-node/esm src/__tests__/registry-quality-check.ts"
   },
   "dependencies": {

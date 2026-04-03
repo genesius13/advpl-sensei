@@ -1,7 +1,10 @@
 /**
  * Snippets Generator - Gera snippets VS Code baseado nas regras de ouro do Sensei
  * Fase 4 - SX Tool & Snippets
+ * Phase 8 - Integração com TDN Validator para validar snippets
  */
+
+import { SnippetsValidator, SnippetValidationReport } from "./snippets-validator.js";
 
 export interface CodeSnippet {
   prefix: string;
@@ -466,5 +469,37 @@ export class SnippetsGenerator {
     });
 
     return markdown;
+  }
+
+  /**
+   * Valida todos os snippets contra TDN
+   * Phase 8 - Garante que snippets usam apenas funções verificadas em TDN
+   */
+  public static validateAllSnippets(langFilter?: "advpl" | "tlpp"): SnippetValidationReport {
+    const snippets = this.generateSnippets();
+    const snippetMap = new Map<string, { body: string[]; language: "advpl" | "tlpp" }>();
+
+    // Mapear snippets com linguagem
+    Object.entries(snippets).forEach(([key, snippet]) => {
+      // Detectar linguagem automaticamente
+      const language =
+        key.includes("tlpp") || snippet.prefix.includes("tlpp") ? "tlpp" : "advpl";
+
+      // Filtrar por linguagem se solicitado
+      if (langFilter && language !== langFilter) return;
+
+      snippetMap.set(key, { body: snippet.body, language });
+    });
+
+    // Validar
+    return SnippetsValidator.validateSnippets(snippetMap);
+  }
+
+  /**
+   * Gera relatório de validação formatado
+   */
+  public static generateValidationReport(langFilter?: "advpl" | "tlpp"): string {
+    const report = this.validateAllSnippets(langFilter);
+    return SnippetsValidator.generateReport(report);
   }
 }

@@ -18,6 +18,7 @@ import { BoilerplateGenerator } from "./boilerplates.js";
 import { SXTool } from "./sx-tool.js";
 import { SnippetsGenerator } from "./snippets-generator.js";
 import { TemplateValidator } from "./template-validator.js";
+import { handleValidateTdn } from "./commands/validate-tdn.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -430,6 +431,33 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         text: result.valid ? `✅ Template Válido\n${report}` : `❌ Template Inválido\n${report}`
       }]
     };
+  }
+
+  // 6. VALIDATE_TDN - Phase 10
+  if (toolName === "advpl_validate_tdn") {
+    try {
+      const result = await handleValidateTdn({
+        code: receivedArguments.code as string | undefined,
+        function: receivedArguments.function as string | undefined,
+        language: (receivedArguments.language as "advpl" | "tlpp" | "both") || "advpl",
+        filename: (receivedArguments.filename as string) || "code.prw",
+        detailed: (receivedArguments.detailed as boolean) || false,
+        forceRefresh: (receivedArguments.forceRefresh as boolean) || false,
+      });
+
+      return {
+        content: [result],
+      };
+    } catch (error) {
+      const errorMsg = error instanceof Error ? error.message : String(error);
+      return {
+        content: [{
+          type: "text",
+          text: `❌ Erro na validação TDN: ${errorMsg}`,
+        }],
+        isError: true,
+      };
+    }
   }
 
   // --- Placeholder para outras ferramentas ---

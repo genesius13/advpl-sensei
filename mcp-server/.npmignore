@@ -1,0 +1,31 @@
+# Development files
+src/
+.vscode/
+node_modules/
+*.test.ts
+**/__tests__/
+.env
+.env.local
+
+# Build artifacts
+tsconfig.json
+test-phase*.ts
+
+# Version control
+.git/
+.gitignore
+
+# System files
+.DS_Store
+Thumbs.db
+*.log
+
+# IDE
+.idea/
+*.swp
+*.swo
+*~
+
+# Scripts (development only)
+scripts/
+
