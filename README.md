@@ -1,63 +1,64 @@
-# Advpl Sensei - MCP Server
+# 🎌 Advpl Sensei — The Protheus MCP Server
 
-![Version](https://img.shields.io/badge/version-1.1.5-blue)
-![Status](https://img.shields.io/badge/status-PRODUCTION%20READY-brightgreen)
-![Tests](https://img.shields.io/badge/tests-94%2F94-brightgreen)
-![License](https://img.shields.io/badge/license-MIT-green)
-![MCP](https://img.shields.io/badge/protocol-MCP-orange)
-![TOTVS](https://img.shields.io/badge/TOTVS-Protheus-orange)
-![ADVPL](https://img.shields.io/badge/lang-ADVPL%20%7C%20TLPP-yellow)
+![Version](https://img.shields.io/badge/version-1.1.5-blue?style=for-the-badge)
+![Status](https://img.shields.io/badge/status-PRODUCTION%20READY-brightgreen?style=for-the-badge)
+![Tests](https://img.shields.io/badge/tests-94%2F94%20(100%25)-brightgreen?style=for-the-badge)
+![Protocol](https://img.shields.io/badge/protocol-MCP-orange?style=for-the-badge)
+![License](https://img.shields.io/badge/license-MIT-lightgrey?style=for-the-badge)
 
-Servidor **Model Context Protocol (MCP)** especializado no ecossistema **TOTVS Protheus** com validação completa de funções e geração inteligente de código. Adicione inteligência avançada em **ADVPL** e **TLPP** ao seu VS Code através de assistentes como GitHub Copilot, Cline ou Roo Code.
+> **Eleve o desenvolvimento TOTVS Protheus a um novo patamar de excelência técnica.**
 
-## 🚀 Funcionalidades
+O **Advpl Sensei** é um servidor **Model Context Protocol (MCP)** de alto desempenho, projetado para injetar inteligência profunda sobre o ecossistema Protheus em assistentes de IA (GitHub Copilot, Cline, Roo Code). Ele resolve o maior problema das IAs genéricas: a criação de funções inexistentes ("alucinações") e o uso de padrões depreciados.
 
-### 🛠 Ferramentas (Tools)
-- **Geração de Código**: Funções, Classes TLPP, MVC, REST APIs, Pontos de Entrada, TReport, Jobs e Workflow.
-- **Validação Inteligente** (NEW - Phase 10):
-  - Valida código ADVPL/TLPP contra TDN (TOTVS Developer Network)
-  - Detecta funções fictícias (ex: HttpServer)
-  - Verifica compatibilidade ADVPL/TLPP
-  - Suporta validação de funções individuais ou blocos de código
-  - Cache inteligente de 24h (forceRefresh disponível)
-  - **Tool:** `advpl_validate_tdn` com suporte multimodal
+---
 
-- **Revisão de Código**: Analise seu código com base em 24 regras de ouro (performance, segurança e boas práticas).
-- **Diagnóstico**: Identifique causas de erros de compilação, runtime e locks.
-- **Migração**: Converta código ADVPL procedural para TLPP orientado a objetos.
-- **Scripts SX**: Gere scripts de dicionário (SX3, SIX, SX1, etc.) a partir de linguagem natural.
-- **Consulta de Dicionário**: Acesso estruturado às tabelas SX (SA1, SF2, SB1, SE1, etc.).
-- **Snippets de Código**: 10 templates VS Code prontos, validados contra TDN.
+## 💎 Diferenciais Estratégicos
 
-### 📊 Validação em 5 Camadas (NEW - Phases 5-10)
-```
-User Input → SnippetsValidator → TdnFunctionValidator → FunctionRegistry → TdnFunctionScraper → MCP API
-```
-- **Layer 1:** SnippetsValidator (10 templates VS Code, 100% TDN coverage)
-- **Layer 2:** TdnFunctionValidator (73 funções TDN-verificadas)
-- **Layer 3:** FunctionRegistry (78 funções reais TOTVS)
-- **Layer 4:** TdnFunctionScraper (76 funções com cache 24h)
-- **Layer 5:** MCP Command API (advpl_validate_tdn - full feature exposure)
+### 🛡️ Validação TDN em 5 Camadas (Anti-Hallucination)
+Diferente de outros assistentes, o Sensei não "chuta" código. Ele valida cada chamada de função contra uma base de dados rigorosa:
+1.  **SnippetsValidator**: 10 templates estruturais validados.
+2.  **TdnFunctionValidator**: Base local de 73 funções essenciais verificadas.
+3.  **FunctionRegistry**: Metadados detalhados de 78 funções reais (assinaturas, tipos e categorias).
+4.  **TdnFunctionScraper**: Motor de busca em tempo real no portal TDN com cache inteligente de 24h.
+5.  **MCP Tool Integration**: Interface direta para validação de blocos de código complexos.
 
-### 📚 Conhecimento (Resources)
-- **Referência Nativa**: Documentação de 190+ funções nativas Protheus.
-- **Database TDN Verificado**: 76 funções catalogadas em 9 categorias (Database, Type, String, Math, Array, Date, Parameters, Interface, Framework).
-- **Dicionário SX**: Estrutura completa das tabelas de sistema (SX1 a SX9) com queries estruturadas.
-- **Funções Restritas**: Alertas em tempo real sobre o uso de funções proibidas pela TOTVS.
-- **Padrões de Projeto**: Templates prontos para MVC, REST e integrações.
-- **Validação de Snippet**: 10 templates VS Code validados contra TDN em tempo real.
+### 🏛️ Arquitetura Orientada a Padrões (Clean Code)
+O código gerado pelo Sensei não apenas funciona; ele segue as **24 Regras de Ouro** do Protheus:
+- **Nomenclatura**: Notação húngara rigorosa (`cNome`, `nValor`, `oModel`).
+- **Segurança**: Detecção proativa de funções restritas e injeção de SQL.
+- **Modernização**: Migração assistida de código procedural (ADVPL) para orientado a objetos (TLPP).
 
-### 🎭 Personas (Prompts)
-- **Code Generator**: Especialista em criar código limpo e performático.
-- **Debugger**: Mestre em encontrar problemas complexos em logs do AppServer.
-- **Process Consultant**: Consultor funcional para os principais módulos ERP.
+---
 
-## 📦 Instalação em Qualquer Máquina (NPM/NPX)
+## 🛠️ Ferramentas Disponíveis (Tools)
 
-Para usar o **Advpl Sensei** no VS Code de qualquer máquina, você não precisa clonar este repositório. Basta configurar seu cliente MCP (GitHub Copilot, Cline ou Roo Code) com:
+| Ferramenta | Função Principal | Destaque Técnico |
+|:---|:---|:---|
+| `advpl_validate_tdn` | Validação Rigorosa | Detecta funções fictícias (ex: `HttpServer`) e valida compatibilidade. |
+| `advpl_generate` | Geração de Código | Cria MVC completo, REST APIs (ADVPL/TLPP), Jobs e Workflows. |
+| `advpl_sx` | Consulta de Dicionário | Acesso estruturado às tabelas SX1 a SX9 e parâmetros MV_*. |
+| `advpl_lint` | Revisão de Código | Analisa o código sob a ótica de performance e boas práticas. |
+| `advpl_migrate` | Modernização | Converte fontes `.prw` para classes `.tlpp` com namespaces. |
+| `advpl_snippets` | Produtividade | Gera e injeta snippets validados diretamente no VS Code. |
 
-### Configuração (Caminho Único)
-Adicione esta configuração ao seu cliente MCP:
+---
+
+## 📚 Biblioteca de Conhecimento (Resources)
+
+O Sensei expõe uma vasta documentação técnica que a IA consulta em milissegundos:
+- **Framework MVC**: Padrões para `ModelDef`, `ViewDef` e `MenuDef`.
+- **Rest API**: Implementações usando `WSRESTFUL` ou classes TLPP modernas.
+- **Pontos de Entrada**: Guia de implementação para os principais pontos do ERP.
+- **Embedded SQL**: Melhores práticas para consultas performáticas em TopConn.
+
+---
+
+## 🚀 Instalação e Uso (Zero Config)
+
+Você não precisa clonar este repositório para usar o Sensei. Adicione-o ao seu cliente MCP (Cline, Roo Code ou Copilot) com um único comando:
+
+### Configuração
+No seu `mcp_settings.json`:
 
 ```json
 {
@@ -70,55 +71,25 @@ Adicione esta configuração ao seu cliente MCP:
 }
 ```
 
-### Por que usar via NPX?
-- **Sempre Atualizado**: O `npx` sempre busca a versão mais recente do Sensei.
-- **Sem Dependências**: Não precisa baixar o código manualmente ou rodar `npm install`.
-- **Fácil**: Funciona instantaneamente no Windows, Linux ou Mac (apenas requer o Node.js instalado).
+### Exemplo de Prompt
+> "Sensei, gere um cadastro MVC para a tabela customizada 'ZZ1', incluindo validações de campo e um gatilho de busca na SA1, seguindo a notação húngara."
 
-## ✅ Status & Fases
+---
 
-**Projeto 100% Funcional** - Todas as 10 fases de implementação completas
+## ✅ Maturidade do Projeto
 
-| Fase | Recurso | Status | Testes |
-|------|---------|--------|--------|
-| 1 | Sensei Linter | ✅ Complete | 5/5 |
-| 2 | Boilerplate Generator | ✅ Complete | 8/8 |
-| 3 | TDN Entry Point Scraper | ✅ Complete | 6/6 |
-| 4 | SX Tool & Snippets | ✅ Complete | 13/13 |
-| 5 | Function Registry & Validation | ✅ Complete | 15/15 |
-| 6 | TDN Function Validator | ✅ Complete | 15/15 |
-| 7 | Coverage Expansion (73 functions) | ✅ Complete | — |
-| 8 | Snippets Validation vs TDN | ✅ Complete | 18/18 |
-| 9 | Automatic Scraper (76 functions, 24h cache) | ✅ Complete | 18/18 |
-| 10 | MCP Command Integration | ✅ Complete | 43/43 |
-| **TOTAL** | **94/94 Tests** | **✅ PRODUCTION READY** | **100% ✅** |
+| Fase | Entrega | Status |
+|:---:|:---|:---:|
+| **1-4** | Core Engine, SX Tool & Boilerplates | ✅ Concluído |
+| **5-7** | Registry Analyzer & TDN Coverage | ✅ Concluído |
+| **8-9** | Snippets Validation & Auto-Scraper | ✅ Concluído |
+| **10** | **MCP Full Integration (Production Ready)** | ✅ Concluído |
 
-Para mais detalhes, veja [IMPLEMENTATION-PHASES-COMPLETE.md](IMPLEMENTATION-PHASES-COMPLETE.md)
-
-## 💡 Exemplos de Uso
-
-Agora que o **Advpl Sensei** está configurado no seu VS Code, você pode usá-lo com comandos simples no chat:
-
-### Gerar Código
-> "Crie uma User Function de faturamento para realizar o cálculo de impostos customizado, seguindo as melhores práticas do Sensei."
-
-### Revisão de Código
-> "Revise este arquivo `.prw` aberto e verifique se estou usando funções restritas da TOTVS ou se há problemas de performance."
-
-### Dicionário e Referência
-> "Consulte os recursos do Sensei e me diga quais são os campos da tabela SX3 e como configurar um gatilho na SX7."
-
-### Migração ADVPL -> TLPP
-> "Migre este código procedural ADVPL para uma classe TLPP organizada, usando namespaces e tipos de dados modernos."
-
-## 🛠 Desenvolvimento
-
-Para rodar em modo de desenvolvimento com hot-reload:
-```bash
-cd mcp-server
-npm run dev
-```
+---
 
 ## 📄 Licença
 
-Este projeto está sob a licença [MIT](LICENSE).
+Este projeto é open-source sob a licença [MIT](LICENSE). Desenvolvido para a comunidade Protheus que busca o estado da arte em tecnologia.
+
+---
+**Advpl Sensei** — *Code with honor, build with precision.*
